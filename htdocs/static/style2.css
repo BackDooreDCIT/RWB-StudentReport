@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans Thai', sans-serif;
+}
+.result-card h1{
+    font-size: 300%;
+    max-block-size: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    padding-left: 30px;
+    padding-bottom: 5px;
+}
+.student-info{
+    max-width: 90%;
+    width: 1200px;
+    margin: 80px auto;
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: #f4f4f4;
+    border-radius: 25px;
+    border: solid #b8b8b8;
+}
+.student-info p{
+    line-height: 2em;
+    font-size: 1.5em;
+}
+.indexlink {
+    text-decoration: none;
+    margin: 100px auto;
+    padding: 20px;
+    font-size: 200%;
+    text-align: center;
+}
+.not-found{
+    max-width: 90%;
+    width: 800px;
+    margin: 80px auto;
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: #ff7a7a;
+    border-radius: 25px;
+    border: 5px solid #ff0000;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 25px;
+}
+    .deduct-form {
+        /* margin-top: 30px;
+        padding: 20px;
+        border: 2px dashed #3498db;
+        border-radius: 10px;
+        background-color: #f9fcff;
+        max-width: 80%;
+        align-items: center;
+        display: flex;
+        flex-direction: column; */
+        max-width: 90%;
+        width: 1200px;
+        margin: 80px auto;
+        padding: 40px;
+        box-sizing: border-box;
+        background-color: #f4f4f4;
+        border-radius: 25px;
+        border: solid #b8b8b8;
+    }
+
+    .deduct-form form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .deduct-form label {
+        font-weight: bold;
+        margin-top: 10px;
+        color: #000000;
+        font-size: 30px;
+    }
+
+    .deduct-form select,
+    .deduct-form input[type="text"] {
+        padding: 8px 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+    }
+
+    .deduct-form button {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #484848;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .deduct-form button:hover {
+        background-color: #272727;
+    }
+
+    #custom_reason {
+        margin-top: 10px;
+    }
+
+    #custom_reason input[type="text"] {
+        margin-top: 5px;
+    }
