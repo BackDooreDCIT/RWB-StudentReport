@@ -1,0 +1,161 @@
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        margin: 0;
+        height: 100vh;
+        background: #fff;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .top-right {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        justify-content: end;
+    }
+    .out {
+      align-items: end;
+    }
+    .logout-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 25px;
+        cursor: pointer;
+        transition: 0.35s ease-in-out;
+        background-color: #343434;
+        color: white;
+    }
+
+    .logout-button:hover {
+        color: white;
+        background-color: #585858;
+        font-size: 30px;
+    }
+    .github-icon-wrapper {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 9999;
+      width: 50px;
+      height: 50px;
+      padding: 5px;
+      padding-top: 0px;
+      transition: 0.5s ease-in-out;
+    }
+
+    .github-icon-wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .github-icon-wrapper:hover {
+      width: 65px;
+      height: 65px;
+    }
+    .welcomemessage {
+        text-align: center;
+        z-index: 9999;
+        max-width: 90%;
+    }
+    .welcomeuser {
+        color: orangered;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      height: 4em;
+      margin-right: 10px;
+      padding: 15px;
+    }
+
+    .topheader {
+      font-size: 1.5em;
+      color: #000000;
+    }
+
+    .rwb {
+      font-size: 2em;
+    }
+
+    .top-left strong {
+      font-weight: bold;
+      font-size: 30px;
+    }
+
+    .search-box {
+      width: 1000%;
+      max-width: 80%;
+      height: auto;
+      max-height: 50%;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 18px 24px;
+      font-size: 18px;
+      border: 2.5px solid #dfe1e5;
+      border-radius: 9999px;
+      outline: none;
+      text-align: left;
+      box-sizing: border-box;
+      transition: 0.2s;
+      background-color: #fff;
+    }
+
+    .search-box input:focus {
+      box-shadow: 0 10px 15px rgba(32,33,36,0.28);
+      border-color: #dfdfdf;
+    }
+    footer {
+    text-align: center;
+    font-size: 22.5px;
+    font-family: 'Noto Sans Thai';
+    color: #999999;
+    padding: 30px;
+    transition: color 0.3s ease;
+    }
+    footer:hover {
+      color: #333333;
+    }
+    .top-right {
+    position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+    }
+.login-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.35s ease-in-out;
+  background-color: #343434;
+  color: white;
+  white-space: nowrap; /* ป้องกันข้อความขึ้นบรรทัดใหม่ */
+}
+
+/* ทำให้เล็กลงเมื่อจอแคบ */
+@media (max-width: 600px) {
+  .login-button {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+}

@@ -1,0 +1,94 @@
+/* ===== Mobile overrides for ALL pages (index, dashboard, login, result, log) ===== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+img, video, canvas { max-width: 100%; height: auto; }
+
+/* Base containers commonly used across your pages */
+.page-wrap, .container, .login-container, .dashboard, .search-container, .result-card, .card {
+  max-width: 100%;
+}
+
+/* Headings & text scale nicely on phones */
+@media (max-width: 768px) {
+  body { -webkit-text-size-adjust: 100%; }
+  .title, h1 { font-size: clamp(20px, 6vw, 28px); }
+  .subtitle, h2 { font-size: clamp(18px, 4.8vw, 22px); }
+}
+
+/* Cards & spacing */
+@media (max-width: 768px) {
+  .page-wrap { max-width: 100%; margin: 20px auto 60px; padding: 0 14px; }
+  .card, .result-card, .login-container, .search-container { padding: 16px 14px !important; border-radius: 12px; }
+}
+
+/* Buttons: full-width & tap-friendly on mobile */
+@media (max-width: 768px) {
+  .btn, button, input[type="submit"], .actions .btn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 16px;   /* prevents iOS zoom issues */
+  }
+  /* Make primary actions expand */
+  .btn.block, .action-card .btn, .filters-actions .btn, .login-container button, .search-container button {
+    width: 100%;
+  }
+}
+
+/* Forms: controls fill width on mobile */
+@media (max-width: 768px) {
+  input[type="text"], input[type="password"], input[type="number"], input[type="search"],
+  input[type="email"], input[type="tel"], select, textarea,
+  .input, .form .input, .deduct-form select, .deduct-form input[type="text"] {
+    width: 100% !important;
+    font-size: 16px; /* avoid iOS zoom */
+    padding: 12px 14px;
+  }
+  .deduct-form label, .form label { font-size: 16px; }
+}
+
+/* Tables: horizontal scroll instead of squish */
+@media (max-width: 768px) {
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; }
+  .nice-table thead th { position: sticky; top: 0; }
+  .nice-table th, .nice-table td { padding: 12px 10px; }
+  .nice-table td.reason { max-width: 100% !important; }
+}
+
+/* Result page */
+@media (max-width: 768px) {
+  .student-grid { display: grid; grid-template-columns: 1fr; gap: 8px 10px; }
+  .student-info, .deduct-form, .not-found { margin: 16px auto; }
+  .indexlink { display: block; text-align: center; margin: 18px auto; font-size: 1.1em; }
+  #custom_reason { margin-top: 8px; }
+}
+
+/* Login page */
+@media (max-width: 768px) {
+  .login-container h2 { text-align: center; font-size: clamp(20px, 6vw, 26px); }
+  .login-container form { display: grid; gap: 10px; }
+  .login-container input { width: 100%; }
+  .extra-links { text-align: center; margin-top: 10px; }
+}
+
+/* Dashboard / Index common helpers */
+@media (max-width: 768px) {
+  .cards, .grid, .dashboard-grid { display: grid; grid-template-columns: 1fr !important; gap: 14px; }
+  .search-box, .search-container form { display: grid; gap: 10px; }
+  .search-container input[type="text"], .search-container button { width: 100%; }
+}
+
+/* Logs page: stack filters toolbar on mobile */
+@media (max-width: 900px) {
+  .toolbar, .toolbar-fw { display: grid !important; grid-template-columns: 1fr !important; gap: 10px; }
+  .filters-actions { justify-content: flex-start !important; flex-wrap: wrap; }
+}
+@media (max-width: 768px) {
+  .filters-fw .input.short,
+  .filters-fw .input.date,
+  .filters-fw .input.tiny {
+    width: 100% !important;
+  }
+}
