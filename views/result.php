@@ -5,6 +5,32 @@
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
+<style>
+  /* Remove outer scrollbar and fix size to viewport */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  #app {
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-height: calc(100vh - 70px) !important;
+    margin-top: 70px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+  
+  .page-wrap {
+    min-height: 100% !important;
+    box-sizing: border-box !important;
+  }
+</style>
+
 <div class="page-wrap">
   <?php $flashes = \Flash::getAll(); if ($flashes): ?>
     <div class="flash-stack">

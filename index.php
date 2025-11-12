@@ -41,7 +41,7 @@ $route = $_GET['route'] ?? 'home';
 // Routes
 if ($route === 'home') {
   if (current_user()) Response::redirect('/?route=dashboard');
-  Response::render('index', ['title'=>'Home']);
+  Response::render('index', ['title'=>'Home', 'route'=>$route]);
   exit;
 }
 
@@ -68,13 +68,13 @@ if ($route === 'login') {
       Flash::add("Auth error: " . $e->getMessage(), "error");
     }
   }
-  Response::render('login', ['title'=>'Login']);
+  Response::render('login', ['title'=>'Login', 'route'=>$route]);
   exit;
 }
 
 if ($route === 'dashboard') {
   require_login();
-  Response::render('dashboard', ['title'=>'Dashboard', 'user'=>current_user()]);
+  Response::render('dashboard', ['title'=>'Dashboard', 'user'=>current_user(), 'route'=>$route]);
   exit;
 }
 
@@ -187,6 +187,7 @@ if ($route === 'log') {
     'per'   => $per,
     'total' => $total,
     'csrf'  => $_SESSION['_csrf'],
+    'route' => $route,
   ]);
   exit;
 }
@@ -363,11 +364,12 @@ if ($route === 'search') {
     'student'=>$student,
     'student_id'=>$student_id,
     'deduction_reasons'=>$REASONS,
-    'student_log'=>$student_log
+    'student_log'=>$student_log,
+    'route'=>$route
   ]);
   exit;
 }
 
 // 404
 http_response_code(404);
-Response::render('index', ['title'=>'Not Found']);
+Response::render('index', ['title'=>'Not Found', 'route'=>'home']);
