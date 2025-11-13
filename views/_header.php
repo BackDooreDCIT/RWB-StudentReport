@@ -18,7 +18,7 @@
       </div>
       <div class="navbar-menu">
         <?php if (!empty($_SESSION['user'])): ?>
-          <a href="/?route=search" class="navbar-item <?= ($route ?? '') === 'search' ? 'active' : '' ?>">หน้าแรก</a>
+          <a href="/?route=dashboard" class="navbar-item <?= ($route ?? '') === 'dashboard' ? 'active' : '' ?>">หน้าแรก</a>
           <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
           <a href="/?route=handbook" class="navbar-item <?= ($route ?? '') === 'handbook' ? 'active' : '' ?>">คู่มือนักเรียน</a>
           <a href="/?route=log" class="navbar-item <?= ($route ?? '') === 'log' ? 'active' : '' ?>">บันทึกการหักคะแนน</a>
