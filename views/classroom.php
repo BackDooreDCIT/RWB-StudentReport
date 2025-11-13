@@ -42,13 +42,12 @@
 
     <div class="toolbar-fw">
       <!-- Filter form -->
-      <form id="classroomFilters" class="filters-fw" method="get" action="/">
+      <form id="classroomFilters" class="filters-fw" method="get" action="/" onsubmit="return validateClassroomForm()">
         <input type="hidden" name="route" value="classroom">
-        <input type="hidden" name="per" value="<?= htmlspecialchars($per ?? 50) ?>">
 
         <div class="field">
           <label>เลือกชั้น</label>
-          <select class="input" name="grade" id="gradeSelect" onchange="this.form.submit()">
+          <select class="input" name="grade" id="gradeSelect" onchange="handleGradeChange()">
             <option value="">-- เลือกชั้น --</option>
             <?php foreach ($grades as $grade): ?>
               <option value="<?= htmlspecialchars($grade) ?>" <?= (strval($selectedGrade) === strval($grade)) ? 'selected' : '' ?>>
@@ -72,35 +71,76 @@
 
         <div class="field">
           <label>ต่อหน้า</label>
-          <input class="input tiny" type="number" min="10" max="200" name="per_display" value="<?= htmlspecialchars($per ?? 50) ?>" onchange="document.querySelector('input[name=per]').value = this.value;">
+          <input class="input tiny" type="number" min="10" max="200" name="per" value="<?= htmlspecialchars($per ?? 50) ?>">
         </div>
       </form>
 
       <div class="filters-actions">
-        <button class="btn" type="submit" form="classroomFilters" <?= (empty($selectedGrade) || empty($selectedRoom)) ? 'disabled title="กรุณาเลือกชั้นและห้องก่อน"' : '' ?>>แสดงรายชื่อ</button>
+        <button class="btn" type="submit" form="classroomFilters" id="showStudentsBtn">แสดงรายชื่อ</button>
         <a class="btn ghost" href="/?route=classroom">ล้างตัวกรอง</a>
       </div>
     </div>
 
 <script>
-// Ensure dropdowns restore values from URL parameters on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const gradeParam = urlParams.get('grade');
-  const roomParam = urlParams.get('room');
+// Handle grade change - reload page with only grade parameter
+function handleGradeChange() {
+  const gradeSelect = document.getElementById('gradeSelect');
+  const grade = gradeSelect.value;
+  const perInput = document.querySelector('input[name=per]');
+  const per = perInput ? perInput.value : 50;
   
+  if (grade) {
+    // Reload page with grade parameter only (no room yet)
+    window.location.href = '/?route=classroom&grade=' + encodeURIComponent(grade) + '&per=' + encodeURIComponent(per);
+  }
+}
+
+// Validate form before submit - ensure both grade and room are selected
+function validateClassroomForm() {
   const gradeSelect = document.getElementById('gradeSelect');
   const roomSelect = document.getElementById('roomSelect');
   
-  // Set grade dropdown
-  if (gradeParam && gradeSelect) {
-    gradeSelect.value = gradeParam;
+  if (!gradeSelect.value) {
+    alert('กรุณาเลือกชั้นก่อน');
+    return false;
   }
   
-  // Set room dropdown
-  if (roomParam && roomSelect) {
-    roomSelect.value = roomParam;
+  if (!roomSelect.value) {
+    alert('กรุณาเลือกห้องก่อน');
+    return false;
   }
+  
+  return true;
+}
+
+// Update button state based on selections
+function updateButtonState() {
+  const gradeSelect = document.getElementById('gradeSelect');
+  const roomSelect = document.getElementById('roomSelect');
+  const showBtn = document.getElementById('showStudentsBtn');
+  
+  if (gradeSelect && roomSelect && showBtn) {
+    if (!gradeSelect.value || !roomSelect.value) {
+      showBtn.disabled = true;
+      showBtn.title = 'กรุณาเลือกชั้นและห้องก่อน';
+    } else {
+      showBtn.disabled = false;
+      showBtn.title = '';
+    }
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const roomSelect = document.getElementById('roomSelect');
+  
+  // Update button state on room change
+  if (roomSelect) {
+    roomSelect.addEventListener('change', updateButtonState);
+  }
+  
+  // Initial button state
+  updateButtonState();
 });
 </script>
   </section>
