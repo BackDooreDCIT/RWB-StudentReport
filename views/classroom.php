@@ -44,13 +44,14 @@
       <!-- Filter form -->
       <form id="classroomFilters" class="filters-fw" method="get" action="/">
         <input type="hidden" name="route" value="classroom">
+        <input type="hidden" name="per" value="<?= htmlspecialchars($per ?? 50) ?>">
 
         <div class="field">
           <label>เลือกชั้น</label>
           <select class="input" name="grade" id="gradeSelect" onchange="this.form.submit()">
             <option value="">-- เลือกชั้น --</option>
             <?php foreach ($grades as $grade): ?>
-              <option value="<?= htmlspecialchars($grade) ?>" <?= ($selectedGrade === $grade) ? 'selected' : '' ?>>
+              <option value="<?= htmlspecialchars($grade) ?>" <?= (strval($selectedGrade) === strval($grade)) ? 'selected' : '' ?>>
                 ม.<?= htmlspecialchars($grade) ?>
               </option>
             <?php endforeach; ?>
@@ -62,7 +63,7 @@
           <select class="input" name="room" id="roomSelect" <?= empty($selectedGrade) ? 'disabled' : '' ?>>
             <option value="">-- เลือกห้อง --</option>
             <?php foreach ($rooms as $room): ?>
-              <option value="<?= htmlspecialchars($room) ?>" <?= ($selectedRoom === $room) ? 'selected' : '' ?>>
+              <option value="<?= htmlspecialchars($room) ?>" <?= (strval($selectedRoom) === strval($room)) ? 'selected' : '' ?>>
                 ห้อง <?= htmlspecialchars($room) ?>
               </option>
             <?php endforeach; ?>
@@ -71,15 +72,37 @@
 
         <div class="field">
           <label>ต่อหน้า</label>
-          <input class="input tiny" type="number" min="10" max="200" name="per" value="<?= htmlspecialchars($per ?? 50) ?>">
+          <input class="input tiny" type="number" min="10" max="200" name="per_display" value="<?= htmlspecialchars($per ?? 50) ?>" onchange="document.querySelector('input[name=per]').value = this.value;">
         </div>
       </form>
 
       <div class="filters-actions">
-        <button class="btn" type="submit" form="classroomFilters">แสดงรายชื่อ</button>
+        <button class="btn" type="submit" form="classroomFilters" <?= (empty($selectedGrade) || empty($selectedRoom)) ? 'disabled title="กรุณาเลือกชั้นและห้องก่อน"' : '' ?>>แสดงรายชื่อ</button>
         <a class="btn ghost" href="/?route=classroom">ล้างตัวกรอง</a>
       </div>
     </div>
+
+<script>
+// Ensure dropdowns restore values from URL parameters on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const gradeParam = urlParams.get('grade');
+  const roomParam = urlParams.get('room');
+  
+  const gradeSelect = document.getElementById('gradeSelect');
+  const roomSelect = document.getElementById('roomSelect');
+  
+  // Set grade dropdown
+  if (gradeParam && gradeSelect) {
+    gradeSelect.value = gradeParam;
+  }
+  
+  // Set room dropdown
+  if (roomParam && roomSelect) {
+    roomSelect.value = roomParam;
+  }
+});
+</script>
   </section>
 
   <?php if ($selectedGrade && $selectedRoom && !empty($students)): ?>
