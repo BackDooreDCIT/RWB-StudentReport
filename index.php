@@ -278,6 +278,73 @@ if ($route === 'undo') {
   exit;
 }
 
+// Classroom — Display all students in selected class
+if ($route === 'classroom') {
+  $selectedClass = param('class', '');
+  $page = max(1, intval(param('page', 1)));
+  $per = max(10, min(200, intval(param('per', 50))));
+  
+  $classrooms = [];
+  $students = [];
+  $all_students = [];
+  
+  try {
+    $data = $gs->getAllRecords($cfg['google']['student_spreadsheet_id'], $cfg['google']['student_sheet_name'], []);
+    
+    // Build list of unique classrooms
+    $classSet = [];
+    foreach ($data['rows'] as $r) {
+      $grade = trim($r['grade'] ?? '');
+      $class = trim($r['class'] ?? '');
+      if ($grade && $class) {
+        $classStr = 'ม.' . $grade . '/' . $class;
+        $classSet[$classStr] = true;
+      }
+    }
+    $classrooms = array_keys($classSet);
+    sort($classrooms, SORT_NATURAL);
+    
+    // Filter students if class is selected
+    if ($selectedClass) {
+      // Parse selected class (e.g., "ม.5/4" -> grade=5, class=4)
+      if (preg_match('/ม\.(\d+)\/(\d+)/', $selectedClass, $matches)) {
+        $targetGrade = $matches[1];
+        $targetClass = $matches[2];
+        
+        foreach ($data['rows'] as $r) {
+          $grade = trim($r['grade'] ?? '');
+          $class = trim($r['class'] ?? '');
+          if ($grade === $targetGrade && $class === $targetClass) {
+            $all_students[] = $r;
+          }
+        }
+      }
+    }
+  } catch (Exception $e) {
+    Flash::add("โหลดข้อมูลไม่สำเร็จ: " . $e->getMessage(), "error");
+  }
+  
+  // Pagination
+  $total = count($all_students);
+  $pages = max(1, intval(ceil($total / $per)));
+  if ($page > $pages) $page = $pages;
+  $offset = ($page - 1) * $per;
+  $students = array_slice($all_students, $offset, $per);
+  
+  Response::render('classroom', [
+    'title' => 'ห้องเรียน',
+    'classrooms' => $classrooms,
+    'selectedClass' => $selectedClass,
+    'students' => $students,
+    'page' => $page,
+    'pages' => $pages,
+    'per' => $per,
+    'total' => $total,
+    'route' => $route,
+  ]);
+  exit;
+}
+
 // Search + Deduct (public search; deduct requires login)
 if ($route === 'search') {
   $student_id = param('studentID','');

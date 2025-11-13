@@ -17,11 +17,13 @@
         </a>
       </div>
       <div class="navbar-menu">
-        <a href="/?route=home" class="navbar-item <?= ($route ?? '') === 'home' ? 'active' : '' ?>">หน้าแรก</a>
-        <a href="/?route=search" class="navbar-item <?= ($route ?? '') === 'search' ? 'active' : '' ?>">นักเรียน</a>
         <?php if (!empty($_SESSION['user'])): ?>
-          <a href="/?route=dashboard" class="navbar-item <?= ($route ?? '') === 'dashboard' ? 'active' : '' ?>">แดชบอร์ด</a>
+          <a href="/?route=search" class="navbar-item <?= ($route ?? '') === 'search' ? 'active' : '' ?>">หน้าแรก</a>
+          <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
           <a href="/?route=log" class="navbar-item <?= ($route ?? '') === 'log' ? 'active' : '' ?>">บันทึกการหักคะแนน</a>
+        <?php else: ?>
+          <a href="/?route=home" class="navbar-item <?= ($route ?? '') === 'home' ? 'active' : '' ?>">หน้าแรก</a>
+          <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
         <?php endif; ?>
       </div>
       <div class="navbar-actions">
