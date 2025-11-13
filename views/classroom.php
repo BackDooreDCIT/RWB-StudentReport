@@ -47,7 +47,7 @@
 
         <div class="field">
           <label>เลือกชั้น</label>
-          <select class="input" name="grade" id="gradeSelect" required onchange="this.form.submit()">
+          <select class="input" name="grade" id="gradeSelect" onchange="this.form.submit()">
             <option value="">-- เลือกชั้น --</option>
             <?php foreach ($grades as $grade): ?>
               <option value="<?= htmlspecialchars($grade) ?>" <?= ($selectedGrade === $grade) ? 'selected' : '' ?>>
@@ -59,7 +59,7 @@
 
         <div class="field">
           <label>เลือกห้อง</label>
-          <select class="input" name="room" id="roomSelect" <?= empty($selectedGrade) ? 'disabled' : '' ?> required>
+          <select class="input" name="room" id="roomSelect" <?= empty($selectedGrade) ? 'disabled' : '' ?>>
             <option value="">-- เลือกห้อง --</option>
             <?php foreach ($rooms as $room): ?>
               <option value="<?= htmlspecialchars($room) ?>" <?= ($selectedRoom === $room) ? 'selected' : '' ?>>
