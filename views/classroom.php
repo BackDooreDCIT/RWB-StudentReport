@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <table class="main-table">
           <thead>
             <tr>
-              <th>ลำดับ</th>
+              <th>เลขที่</th>
               <th>รหัสนักเรียน</th>
               <th>คำนำหน้า</th>
               <th>ชื่อ</th>
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <tbody>
             <?php foreach ($students as $student): ?>
               <tr>
-                <td><?= htmlspecialchars($student['no'] ?? '') ?></td>
+                <td><?= htmlspecialchars($student['no'] ?? $student['no.'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['id'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['prefix'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['surname'] ?? '') ?></td>
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><?= htmlspecialchars($student['class'] ?? '') ?></td>
                 <td><strong><?= htmlspecialchars($student['score'] ?? '100') ?></strong></td>
                 <td>
-                  <a class="btn-sm" href="/?route=search&q=<?= urlencode($student['id'] ?? '') ?>">ดูรายละเอียด</a>
+                  <a class="btn-sm" href="/?route=search&studentID=<?= urlencode($student['id'] ?? '') ?>">ดูรายละเอียด</a>
                 </td>
               </tr>
             <?php endforeach; ?>

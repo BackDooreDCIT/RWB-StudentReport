@@ -20,10 +20,12 @@
         <?php if (!empty($_SESSION['user'])): ?>
           <a href="/?route=search" class="navbar-item <?= ($route ?? '') === 'search' ? 'active' : '' ?>">หน้าแรก</a>
           <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
+          <a href="/?route=handbook" class="navbar-item <?= ($route ?? '') === 'handbook' ? 'active' : '' ?>">คู่มือนักเรียน</a>
           <a href="/?route=log" class="navbar-item <?= ($route ?? '') === 'log' ? 'active' : '' ?>">บันทึกการหักคะแนน</a>
         <?php else: ?>
           <a href="/?route=home" class="navbar-item <?= ($route ?? '') === 'home' ? 'active' : '' ?>">หน้าแรก</a>
           <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
+          <a href="/?route=handbook" class="navbar-item <?= ($route ?? '') === 'handbook' ? 'active' : '' ?>">คู่มือนักเรียน</a>
         <?php endif; ?>
       </div>
       <div class="navbar-actions">

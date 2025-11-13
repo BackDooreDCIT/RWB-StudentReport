@@ -278,6 +278,15 @@ if ($route === 'undo') {
   exit;
 }
 
+// Student Handbook
+if ($route === 'handbook') {
+  Response::render('handbook', [
+    'title' => 'คู่มือนักเรียน',
+    'route' => $route,
+  ]);
+  exit;
+}
+
 // Classroom — Display all students in selected class
 if ($route === 'classroom') {
   $selectedGrade = param('grade', '');
