@@ -41,7 +41,7 @@ $route = $_GET['route'] ?? 'home';
 // Routes
 if ($route === 'home') {
   if (current_user()) Response::redirect('/?route=dashboard');
-  Response::render('index', ['title'=>'Home']);
+  Response::render('index', ['title'=>'Home', 'route'=>$route]);
   exit;
 }
 
@@ -68,13 +68,13 @@ if ($route === 'login') {
       Flash::add("Auth error: " . $e->getMessage(), "error");
     }
   }
-  Response::render('login', ['title'=>'Login']);
+  Response::render('login', ['title'=>'Login', 'route'=>$route]);
   exit;
 }
 
 if ($route === 'dashboard') {
   require_login();
-  Response::render('dashboard', ['title'=>'Dashboard', 'user'=>current_user()]);
+  Response::render('dashboard', ['title'=>'Dashboard', 'user'=>current_user(), 'route'=>$route]);
   exit;
 }
 
@@ -187,6 +187,7 @@ if ($route === 'log') {
     'per'   => $per,
     'total' => $total,
     'csrf'  => $_SESSION['_csrf'],
+    'route' => $route,
   ]);
   exit;
 }
@@ -277,6 +278,92 @@ if ($route === 'undo') {
   exit;
 }
 
+// Student Handbook
+if ($route === 'handbook') {
+  Response::render('handbook', [
+    'title' => 'คู่มือนักเรียน',
+    'route' => $route,
+  ]);
+  exit;
+}
+
+// Classroom — Display all students in selected class
+if ($route === 'classroom') {
+  $selectedGrade = param('grade', '');
+  $selectedRoom = param('room', '');
+  $page = max(1, intval(param('page', 1)));
+  $per = max(10, min(200, intval(param('per', 50))));
+  
+  $grades = [];
+  $rooms = [];
+  $students = [];
+  $all_students = [];
+  
+  try {
+    $data = $gs->getAllRecords($cfg['google']['student_spreadsheet_id'], $cfg['google']['student_sheet_name'], []);
+    
+    // Build list of unique grades
+    $gradeSet = [];
+    foreach ($data['rows'] as $r) {
+      $grade = trim($r['grade'] ?? '');
+      if ($grade) {
+        $gradeSet[$grade] = true;
+      }
+    }
+    $grades = array_keys($gradeSet);
+    sort($grades, SORT_NATURAL);
+    
+    // Build list of rooms for selected grade
+    if ($selectedGrade) {
+      $roomSet = [];
+      foreach ($data['rows'] as $r) {
+        $grade = trim($r['grade'] ?? '');
+        $room = trim($r['class'] ?? '');
+        if ($grade === $selectedGrade && $room) {
+          $roomSet[$room] = true;
+        }
+      }
+      $rooms = array_keys($roomSet);
+      sort($rooms, SORT_NATURAL);
+    }
+    
+    // Filter students if both grade and room are selected
+    if ($selectedGrade && $selectedRoom) {
+      foreach ($data['rows'] as $r) {
+        $grade = trim($r['grade'] ?? '');
+        $room = trim($r['class'] ?? '');
+        if ($grade === $selectedGrade && $room === $selectedRoom) {
+          $all_students[] = $r;
+        }
+      }
+    }
+  } catch (Exception $e) {
+    Flash::add("โหลดข้อมูลไม่สำเร็จ: " . $e->getMessage(), "error");
+  }
+  
+  // Pagination
+  $total = count($all_students);
+  $pages = max(1, intval(ceil($total / $per)));
+  if ($page > $pages) $page = $pages;
+  $offset = ($page - 1) * $per;
+  $students = array_slice($all_students, $offset, $per);
+  
+  Response::render('classroom', [
+    'title' => 'ห้องเรียน',
+    'grades' => $grades,
+    'rooms' => $rooms,
+    'selectedGrade' => $selectedGrade,
+    'selectedRoom' => $selectedRoom,
+    'students' => $students,
+    'page' => $page,
+    'pages' => $pages,
+    'per' => $per,
+    'total' => $total,
+    'route' => $route,
+  ]);
+  exit;
+}
+
 // Search + Deduct (public search; deduct requires login)
 if ($route === 'search') {
   $student_id = param('studentID','');
@@ -363,11 +450,12 @@ if ($route === 'search') {
     'student'=>$student,
     'student_id'=>$student_id,
     'deduction_reasons'=>$REASONS,
-    'student_log'=>$student_log
+    'student_log'=>$student_log,
+    'route'=>$route
   ]);
   exit;
 }
 
 // 404
 http_response_code(404);
-Response::render('index', ['title'=>'Not Found']);
+Response::render('index', ['title'=>'Not Found', 'route'=>'home']);

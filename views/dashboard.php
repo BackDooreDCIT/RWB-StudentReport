@@ -5,25 +5,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<div class="top-right">
-  <div class="logout">
-    <a href="/?route=logout" class="logout-button"><strong>Logout</strong></a><br>
-  </div>
-  <div class="log">
-    <a class="btn" href="/?route=log" style="margin-top:16px; display:inline-block; color:black;">ดูบันทึกการหักคะแนน</a>
-  </div>
-</div>
-
-
-
-<div>
-  <a href="https://github.com/teety5354/RWB_student_report"
-     class="github-icon-wrapper"
-     target="_blank"
-     rel="noopener noreferrer">
-    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
-  </a>
-</div>
+<style>
+  /* Remove scrollbar and fix size to viewport - dashboard page */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  #app {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-height: calc(100vh - 70px) !important;
+    margin-top: 70px !important;
+    overflow: hidden !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+  }
+</style>
 
 <h1 class="welcomemessage">Welcome, <span class="welcomeuser"><?= htmlspecialchars($user ?? ($_SESSION['user'] ?? '')) ?></span>!</h1>
 
