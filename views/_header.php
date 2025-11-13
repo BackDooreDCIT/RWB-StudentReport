@@ -25,7 +25,7 @@
         <?php endif; ?>
       </div>
       <div class="navbar-actions">
-        <a href="https://github.com/teety5354/RWB_student_report" 
+        <a href="https://github.com/BackDooreDCIT/RWB-StudentReport" 
            class="navbar-github" 
            target="_blank" 
            rel="noopener noreferrer"
