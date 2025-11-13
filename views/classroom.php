@@ -46,12 +46,24 @@
         <input type="hidden" name="route" value="classroom">
 
         <div class="field">
-          <label>เลือกห้องเรียน</label>
-          <select class="input" name="class" required>
+          <label>เลือกชั้น</label>
+          <select class="input" name="grade" id="gradeSelect" required onchange="this.form.submit()">
+            <option value="">-- เลือกชั้น --</option>
+            <?php foreach ($grades as $grade): ?>
+              <option value="<?= htmlspecialchars($grade) ?>" <?= ($selectedGrade === $grade) ? 'selected' : '' ?>>
+                ม.<?= htmlspecialchars($grade) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>เลือกห้อง</label>
+          <select class="input" name="room" id="roomSelect" <?= empty($selectedGrade) ? 'disabled' : '' ?> required>
             <option value="">-- เลือกห้อง --</option>
-            <?php foreach ($classrooms as $cls): ?>
-              <option value="<?= htmlspecialchars($cls) ?>" <?= ($selectedClass === $cls) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cls) ?>
+            <?php foreach ($rooms as $room): ?>
+              <option value="<?= htmlspecialchars($room) ?>" <?= ($selectedRoom === $room) ? 'selected' : '' ?>>
+                ห้อง <?= htmlspecialchars($room) ?>
               </option>
             <?php endforeach; ?>
           </select>
@@ -70,7 +82,7 @@
     </div>
   </section>
 
-  <?php if ($selectedClass && !empty($students)): ?>
+  <?php if ($selectedGrade && $selectedRoom && !empty($students)): ?>
     <section class="card table-card">
       <div class="table-head">
         <div>
@@ -127,7 +139,7 @@
         <div class="pagination">
           <?php for ($p = 1; $p <= $pages; $p++): ?>
             <?php
-              $url = "/?route=classroom&class=" . urlencode($selectedClass) . "&per=" . urlencode($per) . "&page=$p";
+              $url = "/?route=classroom&grade=" . urlencode($selectedGrade) . "&room=" . urlencode($selectedRoom) . "&per=" . urlencode($per) . "&page=$p";
               $cls = ($p === $page) ? 'page-link active' : 'page-link';
             ?>
             <a href="<?= $url ?>" class="<?= $cls ?>"><?= $p ?></a>
@@ -135,9 +147,9 @@
         </div>
       <?php endif; ?>
     </section>
-  <?php elseif ($selectedClass && empty($students)): ?>
+  <?php elseif ($selectedGrade && $selectedRoom && empty($students)): ?>
     <section class="card">
-      <p>ไม่พบนักเรียนในห้อง <?= htmlspecialchars($selectedClass) ?></p>
+      <p>ไม่พบนักเรียนในห้อง ม.<?= htmlspecialchars($selectedGrade) ?>/<?= htmlspecialchars($selectedRoom) ?></p>
     </section>
   <?php endif; ?>
 </div>
