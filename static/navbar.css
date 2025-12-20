@@ -287,6 +287,16 @@ body {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
+
+  .main-navbar:not(.is-open) .navbar-menu,
+  .main-navbar:not(.is-open) .navbar-actions {
+    display: none;
+  }
+
+  .main-navbar.is-open .navbar-menu,
+  .main-navbar.is-open .navbar-actions {
+    display: flex;
+  }
 }
 
 @media (max-width: 480px) {
