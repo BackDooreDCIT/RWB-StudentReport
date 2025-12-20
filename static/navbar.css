@@ -28,14 +28,6 @@ body {
   flex-wrap: nowrap;
 }
 
-.navbar-content {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex: 1;
-  justify-content: space-between;
-}
-
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -187,6 +179,22 @@ body {
   padding: 0.4rem;
 }
 
+/* Force desktop layout to keep the toggle hidden and the menu visible */
+@media (min-width: 1101px) {
+  .navbar-toggle {
+    display: none !important;
+  }
+
+  .navbar-menu,
+  .navbar-actions {
+    display: flex !important;
+  }
+
+  .navbar-container {
+    flex-wrap: nowrap;
+  }
+}
+
 .navbar-toggle span {
   display: block;
   width: 26px;
@@ -296,12 +304,12 @@ body {
 
   .main-navbar:not(.is-open) .navbar-menu,
   .main-navbar:not(.is-open) .navbar-actions {
-    display: none;
+    display: none !important;
   }
 
   .main-navbar.is-open .navbar-menu,
   .main-navbar.is-open .navbar-actions {
-    display: flex;
+    display: flex !important;
   }
 }
 
