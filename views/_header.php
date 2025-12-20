@@ -16,7 +16,12 @@
           <span>RWB Student Report</span>
         </a>
       </div>
-      <div class="navbar-menu">
+      <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="navbar-menu" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="navbar-menu" id="navbar-menu">
         <?php if (!empty($_SESSION['user'])): ?>
           <a href="/?route=dashboard" class="navbar-item <?= ($route ?? '') === 'dashboard' ? 'active' : '' ?>">หน้าแรก</a>
           <a href="/?route=classroom" class="navbar-item <?= ($route ?? '') === 'classroom' ? 'active' : '' ?>">ห้องเรียน</a>
@@ -29,9 +34,9 @@
         <?php endif; ?>
       </div>
       <div class="navbar-actions">
-        <a href="https://github.com/BackDooreDCIT/RWB-StudentReport" 
-           class="navbar-github" 
-           target="_blank" 
+        <a href="https://github.com/BackDooreDCIT/RWB-StudentReport"
+           class="navbar-github"
+           target="_blank"
            rel="noopener noreferrer"
            title="GitHub Repository">
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
@@ -46,3 +51,16 @@
     </div>
   </nav>
   <div id="app">
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var toggle = document.querySelector('.navbar-toggle');
+      var nav = document.querySelector('.main-navbar');
+
+      if (!toggle || !nav) return;
+
+      toggle.addEventListener('click', function() {
+        var isOpen = nav.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    });
+  </script>
