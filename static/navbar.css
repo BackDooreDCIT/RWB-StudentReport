@@ -262,7 +262,6 @@ body {
   }
 
   .navbar-menu {
-    order: 3;
     width: 100%;
     justify-content: flex-start;
     flex-direction: column;
