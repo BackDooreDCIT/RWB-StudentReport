@@ -27,6 +27,14 @@ body {
   gap: 2rem;
 }
 
+.navbar-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: space-between;
+}
+
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -165,6 +173,25 @@ body {
   transform: translateY(-2px);
 }
 
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+.navbar-toggle span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: #374151;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
 /* Mobile Responsive */
 @media (max-width: 1024px) {
   .navbar-container {
@@ -184,12 +211,33 @@ body {
 
 @media (max-width: 768px) {
   .navbar-container {
-    flex-wrap: wrap;
-    padding: 0.5rem 1rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 0.75rem;
   }
 
   .navbar-brand {
     flex: 1;
+  }
+
+  .navbar-toggle {
+    display: flex;
+    align-self: center;
+  }
+
+  .navbar-content {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding-top 0.2s ease;
+  }
+
+  .main-navbar.is-open .navbar-content {
+    max-height: 500px;
+    padding-top: 0.75rem;
   }
 
   .navbar-logo img {
@@ -201,22 +249,28 @@ body {
   }
 
   .navbar-menu {
-    order: 3;
     width: 100%;
     justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
     gap: 0.25rem;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 0.25rem;
   }
 
   .navbar-item {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.95rem;
+    width: 100%;
   }
 
   .navbar-actions {
-    gap: 0.5rem;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .navbar-github img {
