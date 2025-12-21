@@ -265,6 +265,11 @@ body {
     margin-left: auto;
   }
 
+  .navbar-toggle {
+    display: flex;
+    align-self: center;
+  }
+
   .navbar-logo img {
     height: 35px;
   }
