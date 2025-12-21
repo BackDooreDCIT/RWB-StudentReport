@@ -24,12 +24,14 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 2rem;
-  gap: 2rem;
+  gap: 1.5rem;
+  flex-wrap: nowrap;
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .navbar-logo {
@@ -62,8 +64,9 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1;
+  flex: 1 1 auto;
   justify-content: center;
+  min-width: 0;
 }
 
 .navbar-item {
@@ -98,6 +101,7 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .navbar-github {
@@ -165,7 +169,68 @@ body {
   transform: translateY(-2px);
 }
 
+.navbar-toggle {
+  display: none !important;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+/* Force desktop layout to keep the toggle hidden and the menu visible */
+@media (min-width: 1100px) {
+  .navbar-container {
+    flex-wrap: nowrap !important;
+    gap: 1.5rem;
+  }
+
+  .navbar-toggle {
+    display: none !important;
+  }
+
+  .navbar-menu,
+  .navbar-actions {
+    display: flex !important;
+  }
+
+  .navbar-menu {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .navbar-actions {
+    gap: 0.75rem;
+  }
+}
+
+.navbar-toggle span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: #374151;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
 /* Mobile Responsive */
+@media (max-width: 1280px) {
+  .navbar-container {
+    padding: 0.75rem 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .navbar-item {
+    padding: 0.55rem 1.1rem;
+  }
+
+  .navbar-btn {
+    padding: 0.55rem 1.2rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .navbar-container {
     padding: 0.75rem 1rem;
@@ -182,14 +247,22 @@ body {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1099px) {
   .navbar-container {
     flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem;
     padding: 0.5rem 1rem;
   }
 
   .navbar-brand {
     flex: 1;
+    min-width: 0;
+  }
+
+  .navbar-toggle {
+    display: flex !important;
+    margin-left: auto;
   }
 
   .navbar-logo img {
@@ -200,23 +273,36 @@ body {
     font-size: 1rem;
   }
 
-  .navbar-menu {
-    order: 3;
+  .navbar-menu,
+  .navbar-actions {
+    display: none;
     width: 100%;
     justify-content: flex-start;
-    gap: 0.25rem;
-    margin-top: 0.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
     padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    background: #e5e7eb;
   }
 
   .navbar-item {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.95rem;
+    width: 100%;
   }
 
   .navbar-actions {
-    gap: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .navbar-actions .navbar-btn,
+  .navbar-actions .navbar-user,
+  .navbar-actions .navbar-github {
+    width: auto;
   }
 
   .navbar-github img {
@@ -232,6 +318,16 @@ body {
   .navbar-btn {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+  }
+
+  .main-navbar:not(.is-open) .navbar-menu,
+  .main-navbar:not(.is-open) .navbar-actions {
+    display: none !important;
+  }
+
+  .main-navbar.is-open .navbar-menu,
+  .main-navbar.is-open .navbar-actions {
+    display: flex !important;
   }
 }
 
