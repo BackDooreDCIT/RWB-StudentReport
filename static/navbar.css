@@ -180,7 +180,7 @@ body {
 }
 
 /* Force desktop layout to keep the toggle hidden and the menu visible */
-@media (min-width: 1200px) {
+@media (min-width: 901px) {
   .navbar-container {
     flex-wrap: nowrap !important;
     gap: 1.5rem;
@@ -247,7 +247,7 @@ body {
   }
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 900px) {
   .navbar-container {
     flex-wrap: wrap;
     align-items: flex-start;
