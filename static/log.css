@@ -133,3 +133,213 @@ input[type="date"].input { padding: 9px 11px; }
 @media (max-width: 560px) {
   .student-grid { grid-template-columns: 1fr; }
 }
+
+
+/* === Score adjust modal + segmented === */
+.segmented{
+  display:flex;
+  gap:10px;
+  padding:8px;
+  border-radius:14px;
+  background: rgba(0,0,0,.06);
+  width: fit-content;
+  margin-bottom: 14px;
+}
+.seg-btn{
+  border:0;
+  background: transparent;
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+}
+.seg-btn.is-active{
+  background:#fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+}
+.picker-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.picker-row .input{ flex: 1; }
+
+/* Keep the readonly display tidy (long reasons) */
+#reasonDisplay{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Selected reason preview (helps on mobile where the input may be tight) */
+.chosen-reason{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.05);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.btn.ghost{
+  background: rgba(0,0,0,.06);
+  color: inherit;
+}
+
+.modal{
+  position: fixed;
+  inset: 0;
+  display:none;
+  z-index: 9999;
+}
+.modal.is-open{ display:block; }
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,.40);
+  opacity:0;
+  animation: modalFade .18s ease forwards;
+}
+
+.modal-panel{
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%) translateY(-10px);
+  width: min(720px, calc(100vw - 28px));
+  max-height: 78vh;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.30);
+  overflow: hidden;
+  opacity: 0;
+  animation: modalDrop .22s ease forwards;
+  display:flex;
+  flex-direction: column;
+}
+
+@keyframes modalFade{
+  to { opacity: 1; }
+}
+@keyframes modalDrop{
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.modal-head h3{
+  margin: 0;
+  font-size: 18px;
+}
+.icon-btn{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 0;
+  background: rgba(0,0,0,.06);
+  cursor:pointer;
+  font-size: 20px;
+  line-height: 1;
+  display:grid;
+  place-items:center;
+}
+
+.modal-search{
+  margin: 14px 16px 10px;
+}
+
+.modal-list{
+  padding: 0 10px 12px;
+  overflow:auto;
+}
+.reason-item{
+  width: 100%;
+  display:grid;
+  grid-template-columns: 100px 1fr 70px;
+  gap: 10px;
+  align-items:center;
+  text-align:left;
+  border:0;
+  background: #fff;
+  padding: 12px 12px;
+  border-radius: 14px;
+  cursor:pointer;
+}
+.reason-item:hover{
+  background: rgba(0,0,0,.04);
+}
+.reason-item + .reason-item{
+  margin-top: 8px;
+}
+.reason-code{
+  font-weight: 800;
+}
+.reason-desc{
+  opacity: .95;
+}
+.reason-pts{
+  font-weight: 800;
+  text-align:right;
+}
+.reason-item.other .reason-pts{ opacity:.55; }
+
+.modal-foot{
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+.modal-foot-actions{
+  margin-top: 10px;
+  display:flex;
+  gap: 10px;
+  justify-content:flex-end;
+}
+
+@media (max-width: 520px){
+  /* Make the picker less cramped */
+  .picker-row{ flex-direction: column; align-items: stretch; }
+  .picker-row .btn{ width: 100%; }
+
+  /* Reduce subpixel transform blur on mobile by avoiding translateX(-50%) */
+  .modal-panel{
+    left: 14px;
+    right: 14px;
+    top: 86px;     /* below navbar */
+    bottom: 14px;
+    width: auto;
+    max-height: none;
+    transform: translateY(12px);
+    animation: modalDropMobile .22s ease forwards;
+  }
+
+  /* Sticky header + search to keep things usable on small screens */
+  .modal-head{
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+  }
+  .modal-search{
+    position: sticky;
+    top: 56px;
+    z-index: 2;
+    background: #fff;
+    margin: 10px 12px 10px;
+  }
+  .modal-list{ padding: 0 8px 12px; }
+
+  .reason-item{ grid-template-columns: 64px 1fr 52px; padding: 14px 12px; }
+  .reason-code{ font-size: 14px; }
+  .reason-desc{ font-size: 14px; }
+  .reason-pts{ font-size: 14px; }
+
+  @keyframes modalDropMobile{
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
