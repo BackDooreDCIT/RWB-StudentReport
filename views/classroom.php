@@ -1,7 +1,7 @@
 <?php /* views/classroom.php — Display all students in selected classroom */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov1">
+<link rel="stylesheet" href="/static/log.css?v=recov2">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
@@ -163,33 +163,33 @@ document.addEventListener('DOMContentLoaded', function() {
       <?php endif; ?>
 
       <div class="table-wrap">
-        <table class="main-table">
+        <table class="nice-table">
           <thead>
             <tr>
-              <th>เลขที่</th>
-              <th>รหัสนักเรียน</th>
+              <th class="nowrap">เลขที่</th>
+              <th class="nowrap">รหัสนักเรียน</th>
               <th>คำนำหน้า</th>
               <th>ชื่อ</th>
               <th>นามสกุล</th>
-              <th>ชั้น</th>
-              <th>ห้อง</th>
-              <th>คะแนนปัจจุบัน</th>
-              <th>ดำเนินการ</th>
+              <th class="nowrap">ชั้น</th>
+              <th class="nowrap">ห้อง</th>
+              <th class="nowrap">คะแนนปัจจุบัน</th>
+              <th class="nowrap">ดำเนินการ</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($students as $student): ?>
               <tr>
-                <td><?= htmlspecialchars($student['no'] ?? $student['no.'] ?? '') ?></td>
-                <td><?= htmlspecialchars($student['id'] ?? '') ?></td>
+                <td class="nowrap"><?= htmlspecialchars($student['no'] ?? $student['no.'] ?? '') ?></td>
+                <td class="nowrap"><?= htmlspecialchars($student['id'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['prefix'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['surname'] ?? '') ?></td>
                 <td><?= htmlspecialchars($student['lastname'] ?? '') ?></td>
-                <td><?= htmlspecialchars($student['grade'] ?? '') ?></td>
-                <td><?= htmlspecialchars($student['class'] ?? '') ?></td>
-                <td><strong><?= htmlspecialchars($student['score'] ?? '100') ?></strong></td>
-                <td>
-                  <a class="btn-sm" href="/?route=search&studentID=<?= urlencode($student['id'] ?? '') ?>">ดูรายละเอียด</a>
+                <td class="nowrap"><?= htmlspecialchars($student['grade'] ?? '') ?></td>
+                <td class="nowrap"><?= htmlspecialchars($student['class'] ?? '') ?></td>
+                <td class="nowrap"><strong><?= htmlspecialchars($student['score'] ?? '100') ?></strong></td>
+                <td class="action">
+                  <a class="btn ghost small" href="/?route=search&studentID=<?= urlencode($student['id'] ?? '') ?>">ดูรายละเอียด</a>
                 </td>
               </tr>
             <?php endforeach; ?>

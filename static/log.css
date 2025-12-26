@@ -85,6 +85,27 @@ input[type="date"].input { padding: 9px 11px; }
 .link { color: #111; text-decoration: none; font-weight: 700; }
 .link:hover { text-decoration: underline; }
 
+/* --- Classroom pagination (match log/result buttons) --- */
+.pagination { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
+.page-link {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background:#fff;
+  color: var(--text);
+  border:1px solid var(--border);
+  text-decoration:none;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.page-link:hover { transform: translateY(-1px); }
+.page-link.active {
+  background: var(--accent);
+  color:#fff;
+  border-color: var(--brand-2);
+}
+
 /* --- Student (result.php) --- */
 .student-grid { display:grid; grid-template-columns: 160px 1fr; gap: 8px 16px; }
 .student-grid .row { display: contents; }

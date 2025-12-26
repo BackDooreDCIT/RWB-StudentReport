@@ -1,7 +1,7 @@
 <?php /* views/result.php — full functional version with styling */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov1">
+<link rel="stylesheet" href="/static/log.css?v=recov2">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
