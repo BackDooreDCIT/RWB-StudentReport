@@ -52,8 +52,11 @@ body {
 
 .navbar-logo img {
   height: 40px;
-  width: auto;
+  width: auto !important;
   border-radius: 4px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 
 .navbar-logo span {
@@ -300,6 +303,11 @@ body {
 
   .navbar-logo img {
     height: 35px;
+    width: auto !important;
+    border-radius: 4px;
+    object-fit: contain;
+    flex: 0 0 auto;
+    flex-shrink: 0;
   }
 
   .navbar-logo span {
