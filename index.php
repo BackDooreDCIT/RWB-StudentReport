@@ -388,20 +388,56 @@ if ($route === 'search') {
       // Reasons from config only
       $REASONS = $cfg['deduction_reasons'] ?? [];
 
-      $reason_code = param('reason_code');
-      $custom_reason = trim(param('custom_reason_detail',''));
-      if (!array_key_exists($reason_code, $REASONS)) {
-        Flash::add("รหัสเหตุผลไม่ถูกต้อง", "error");
-      } else {
-        list($reason_desc, $deduct_points) = $REASONS[$reason_code];
-        if ($reason_code === 'อื่นๆ') {
-          if ($custom_reason === '') { Flash::add("กรุณากรอกรายละเอียดเหตุผล", "error"); Response::redirect('/?route=search&studentID=' . urlencode($student_id)); }
-          $reason_desc = "อื่นๆ: " . $custom_reason;
+      // mode: deduct (default) or add
+      $mode = param('mode', 'deduct');
+      $mode = ($mode === 'add') ? 'add' : 'deduct';
+
+      $delta = 0;
+      $reason_desc = '';
+
+      if ($mode === 'add') {
+        $add_points = intval(param('add_points', 0));
+        $add_reason = trim(param('add_reason', ''));
+
+        if ($add_points <= 0) {
+          Flash::add("กรุณาระบุจำนวนคะแนนที่เพิ่ม", "error");
+          Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+        }
+        if ($add_reason === '') {
+          Flash::add("กรุณาระบุเหตุผลที่เพิ่มคะแนน", "error");
+          Response::redirect('/?route=search&studentID=' . urlencode($student_id));
         }
 
-        $current_score = intval($student['score'] ?? 0);
-        $deduct_points = intval($deduct_points);
-        $new_score = $current_score - $deduct_points; // negatives allowed
+        $delta = abs($add_points);
+        $reason_desc = "เพิ่มคะแนน: " . $add_reason;
+      } else {
+        $reason_code = param('reason_code');
+        $custom_reason = trim(param('custom_reason_detail', ''));
+
+        if (!array_key_exists($reason_code, $REASONS)) {
+          Flash::add("รหัสเหตุผลไม่ถูกต้อง", "error");
+          Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+        }
+
+        list($desc, $pts) = $REASONS[$reason_code];
+        $pts = intval($pts);
+
+        if ($reason_code === 'อื่นๆ') {
+          if ($custom_reason === '') {
+            Flash::add("กรุณากรอกรายละเอียดเหตุผล", "error");
+            Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+          }
+          $desc = "อื่นๆ: " . $custom_reason;
+          $custom_pts = intval(param('custom_points', 0));
+          if ($custom_pts <= 0) { $custom_pts = 5; }
+          $pts = abs($custom_pts);
+        }
+
+        $delta = -abs($pts);
+        $reason_desc = ($desc !== '' ? $desc : $reason_code);
+      }
+
+$current_score = intval($student['score'] ?? 0);        $new_score = $current_score + $delta; // negatives allowed
 
         // Update score
         $gs->updateCell($cfg['google']['student_spreadsheet_id'], $cfg['google']['student_sheet_name'], $row_index, $score_col, $new_score);
@@ -415,18 +451,22 @@ if ($route === 'search') {
           ($student['prefix'] ?? '') . ' ' . ($student['surname'] ?? '') . ' ' . ($student['lastname'] ?? ''),
           'ม.' . ($student['grade'] ?? '') . '/' . ($student['class'] ?? ''),
           $current_score,
-          -$deduct_points,
+          $delta,
           $new_score,
           $reason_desc,
           $teacher
         ];
         $gs->appendRow($cfg['google']['log_spreadsheet_id'], $cfg['google']['log_sheet_name'], $row);
 
-        Flash::add('หักคะแนนสำเร็จ (' . $deduct_points . ' คะแนน) จาก ' . $current_score . ' เป็น ' . $new_score, 'success');
+        if ($mode === 'add') {
+          Flash::add('เพิ่มคะแนนสำเร็จ (+' . $delta . ' คะแนน) จาก ' . $current_score . ' เป็น ' . $new_score, 'success');
+        } else {
+          Flash::add('หักคะแนนสำเร็จ (' . abs($delta) . ' คะแนน) จาก ' . $current_score . ' เป็น ' . $new_score, 'success');
+        }
         Response::redirect('/?route=search&studentID=' . urlencode($student_id));
-      }
-    }
-  } catch (Exception $e) {
+	      }
+	    }
+	  catch (Exception $e) {
     Flash::add("เกิดข้อผิดพลาด: " . $e->getMessage(), "error");
   }
 
