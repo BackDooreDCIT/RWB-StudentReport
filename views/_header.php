@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= isset($title)?htmlspecialchars($title):'App' ?></title>
-  <link rel="stylesheet" href="/static/navbar.css">
+  <link rel="stylesheet" href="/static/navbar.css?v=2">
   <!-- Minimal shell: no global CSS here to avoid overriding your page styles -->
 </head>
 <body class="has-navbar">

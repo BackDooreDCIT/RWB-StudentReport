@@ -180,6 +180,10 @@ body {
   border: none;
   cursor: pointer;
   padding: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
 }
 
 /* Force desktop layout to keep the toggle hidden and the menu visible */
@@ -378,4 +382,35 @@ body.has-navbar {
   display: block !important;
   justify-content: flex-start !important;
   align-items: stretch !important;
+}
+
+/*
+  Mobile hamburger hard override
+  Why: some pages load additional CSS AFTER navbar.css (and even inline styles).
+  Keep navbar single-line when closed, and only expand vertically when opened.
+*/
+@media (max-width: 1024px) {
+  .main-navbar .navbar-container {
+    flex-wrap: nowrap !important;   /* prevents the menu from wrapping into a 2nd row */
+    align-items: center !important;
+  }
+
+  .main-navbar .navbar-toggle {
+    display: flex !important;
+  }
+
+  .main-navbar .navbar-menu,
+  .main-navbar .navbar-actions {
+    display: none !important;
+  }
+
+  .main-navbar.is-open .navbar-container {
+    flex-wrap: wrap !important;     /* allow dropdown to take the full width */
+    align-items: flex-start !important;
+  }
+
+  .main-navbar.is-open .navbar-menu,
+  .main-navbar.is-open .navbar-actions {
+    display: flex !important;
+  }
 }
