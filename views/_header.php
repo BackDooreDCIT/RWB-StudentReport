@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= isset($title)?htmlspecialchars($title):'App' ?></title>
-  <link rel="stylesheet" href="/static/navbar.css?v=3">
+  <link rel="stylesheet" href="/static/navbar.css?v=4">
   <!-- Minimal shell: no global CSS here to avoid overriding your page styles -->
 </head>
 <body class="has-navbar">
@@ -16,11 +16,12 @@
           <span>RWB Student Report</span>
         </a>
       </div>
-      <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="navbar-menu" aria-label="Toggle navigation">
+      <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="navbar-collapse" aria-label="Toggle navigation">
         <span></span>
         <span></span>
         <span></span>
       </button>
+      <div class="navbar-collapse" id="navbar-collapse">
       <div class="navbar-menu" id="navbar-menu">
         <?php if (!empty($_SESSION['user'])): ?>
           <a href="/?route=dashboard" class="navbar-item <?= ($route ?? '') === 'dashboard' ? 'active' : '' ?>">หน้าแรก</a>
@@ -47,6 +48,7 @@
         <?php else: ?>
           <a href="/?route=login" class="navbar-btn login">เข้าสู่ระบบ</a>
         <?php endif; ?>
+      </div>
       </div>
     </div>
   </nav>

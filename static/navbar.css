@@ -63,6 +63,15 @@ body {
   text-overflow: ellipsis;
 }
 
+.navbar-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .navbar-menu {
   display: flex;
   align-items: center;
@@ -191,6 +200,19 @@ body {
 
 /* Force desktop layout to keep the toggle hidden and the menu visible */
 @media (min-width: 1025px) {
+  .navbar-collapse {
+    position: static;
+    max-height: none;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    overflow: visible;
+    padding: 0;
+    border-top: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
   .navbar-container {
     flex-wrap: nowrap !important;
     gap: 1.5rem;
@@ -259,10 +281,11 @@ body {
 
 @media (max-width: 1024px) {
   .navbar-container {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.5rem;
+    position: relative;
+    flex-wrap: nowrap !important;   /* keep the top row single-line */
+    align-items: center !important;
     padding: 0.5rem 1rem;
+    gap: 0.75rem;
   }
 
   .navbar-brand {
@@ -284,30 +307,63 @@ body {
     max-width: 60vw;
   }
 
-  .navbar-menu,
-  .navbar-actions {
-    display: none !important;
-    width: 100%;
-    justify-content: flex-start;
+  /* Dropdown container (animated) */
+  .navbar-collapse {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: #e5e7eb;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    border-radius: 0 0 14px 14px;
+    padding: 0.6rem 0.75rem 0.75rem;
+
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+
+    transition: max-height 280ms ease, opacity 180ms ease, transform 280ms ease;
+  }
+
+  .main-navbar.is-open .navbar-collapse {
+    max-height: 70vh; /* plenty for long menus */
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .navbar-menu {
+    display: flex !important;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    padding-top: 0.5rem;
-    background: #e5e7eb;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    flex: 0 0 auto;
+    border-top: none;
+    padding-top: 0;
+    background: transparent;
   }
 
   .navbar-item {
+    width: 100%;
     padding: 0.75rem 0.9rem;
     font-size: 0.95rem;
-    width: 100%;
   }
 
   .navbar-actions {
+    display: flex !important;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
-    padding-bottom: 0.25rem;
+    width: 100%;
+
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: transparent;
   }
 
   .navbar-actions .navbar-btn,
@@ -316,35 +372,8 @@ body {
     width: auto;
   }
 
-  .navbar-github img {
-    width: 28px;
-    height: 28px;
-  }
-
-  .navbar-user {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-  }
-
-  .navbar-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .main-navbar:not(.is-open) .navbar-menu,
-  .main-navbar:not(.is-open) .navbar-actions {
-    display: none !important;
-  }
-
-  .main-navbar.is-open .navbar-menu,
-  .main-navbar.is-open .navbar-actions {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  /* Keep GitHub icon from stretching full-width in the mobile dropdown */
-  .main-navbar.is-open .navbar-github {
+  /* Keep GitHub icon circular + tidy in dropdown */
+  .navbar-github {
     align-self: flex-start;
     width: 40px;
     height: 40px;
@@ -352,13 +381,13 @@ body {
     border-radius: 50%;
   }
 
-  .main-navbar.is-open .navbar-github img {
+  .navbar-github img {
     width: 24px;
     height: 24px;
     object-fit: contain;
   }
-
 }
+
 
 @media (max-width: 480px) {
   .navbar-logo span {
@@ -403,33 +432,3 @@ body.has-navbar {
   align-items: stretch !important;
 }
 
-/*
-  Mobile hamburger hard override
-  Why: some pages load additional CSS AFTER navbar.css (and even inline styles).
-  Keep navbar single-line when closed, and only expand vertically when opened.
-*/
-@media (max-width: 1024px) {
-  .main-navbar .navbar-container {
-    flex-wrap: nowrap !important;   /* prevents the menu from wrapping into a 2nd row */
-    align-items: center !important;
-  }
-
-  .main-navbar .navbar-toggle {
-    display: flex !important;
-  }
-
-  .main-navbar .navbar-menu,
-  .main-navbar .navbar-actions {
-    display: none !important;
-  }
-
-  .main-navbar.is-open .navbar-container {
-    flex-wrap: wrap !important;     /* allow dropdown to take the full width */
-    align-items: flex-start !important;
-  }
-
-  .main-navbar.is-open .navbar-menu,
-  .main-navbar.is-open .navbar-actions {
-    display: flex !important;
-  }
-}
