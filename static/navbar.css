@@ -175,6 +175,8 @@ body {
 .navbar-toggle {
   display: none !important;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
   background: transparent;
   border: none;
@@ -182,6 +184,7 @@ body {
   padding: 0.4rem;
   min-width: 44px;
   min-height: 44px;
+  box-sizing: border-box;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.75);
 }
@@ -339,6 +342,22 @@ body {
     flex-direction: column;
     align-items: stretch;
   }
+
+  /* Keep GitHub icon from stretching full-width in the mobile dropdown */
+  .main-navbar.is-open .navbar-github {
+    align-self: flex-start;
+    width: 40px;
+    height: 40px;
+    padding: 0.35rem;
+    border-radius: 50%;
+  }
+
+  .main-navbar.is-open .navbar-github img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
 }
 
 @media (max-width: 480px) {
