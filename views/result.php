@@ -1,7 +1,7 @@
 <?php /* views/result.php — full functional version with styling */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov5">
+<link rel="stylesheet" href="/static/log.css?v=recov6">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
@@ -102,11 +102,20 @@
         <div class="modal-backdrop" data-close></div>
         <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="reasonTitle">
           <div class="modal-head">
-            <h3 id="reasonTitle">เลือกเหตุผลหักคะแนน</h3>
+            <div class="modal-title">
+              <div class="modal-title-row">
+                <span class="modal-badge" aria-hidden="true">−</span>
+                <h3 id="reasonTitle">เลือกเหตุผลหักคะแนน</h3>
+              </div>
+              <div class="modal-sub">ค้นหาแล้วกดรายการเพื่อเลือก</div>
+            </div>
             <button class="icon-btn" type="button" data-close aria-label="ปิด">×</button>
           </div>
 
-          <input class="input modal-search" id="reasonSearch" type="text" placeholder="ค้นหา… (พิมพ์เลข/คำ เช่น 109, ทรงผม, มาสาย)">
+          <div class="modal-search-wrap">
+            <span class="search-ico" aria-hidden="true">🔎</span>
+            <input class="input modal-search" id="reasonSearch" type="text" placeholder="ค้นหา… (พิมพ์เลข/คำ เช่น 109, ทรงผม, มาสาย)">
+          </div>
 
           <div class="modal-list" id="reasonList">
             <?php foreach (($deduction_reasons ?? []) as $code => $info): ?>
@@ -179,6 +188,22 @@
           const useCustom = document.getElementById("useCustomReason");
           const cancelCustom = document.getElementById("cancelCustom");
 
+          function clearSelected(){
+            [...list.querySelectorAll(".reason-item")].forEach(b => b.classList.remove("is-selected"));
+          }
+
+          function markSelected(code){
+            clearSelected();
+            if (!code) return;
+            const btn = list.querySelector(`.reason-item[data-code="${CSS.escape(code)}"]`);
+            if (!btn) return;
+            btn.classList.add("is-selected");
+            // If it's currently filtered out, make it visible
+            btn.style.display = "";
+            // Keep it in view
+            try { btn.scrollIntoView({block:"nearest"}); } catch(e) {}
+          }
+
           function openModal(){
             modal.classList.add("is-open");
             modal.setAttribute("aria-hidden","false");
@@ -187,6 +212,8 @@
             customBox.style.display = "none";
             customInput.value = "";
             if (customPtsInput) customPtsInput.value = 5;
+            // Highlight previously chosen reason (if any)
+            markSelected(reasonCode.value);
             setTimeout(() => search.focus(), 50);
           }
           function closeModal(){
@@ -224,12 +251,14 @@
             const desc = btn.dataset.desc || "";
 
             if (code === "อื่นๆ") {
+              markSelected(code);
               customBox.style.display = "";
               setTimeout(() => customInput.focus(), 50);
               return;
             }
 
             reasonCode.value = code;
+            markSelected(code);
             customHidden.value = "";
             customPtsHidden.value = "";
             // Keep the input short-ish (ellipsis handled by CSS), and show full text in the chip (better on mobile)
@@ -246,6 +275,7 @@
             const v = (customInput.value || "").trim();
             if (!v) { customInput.focus(); return; }
             reasonCode.value = "อื่นๆ";
+            markSelected("อื่นๆ");
             customHidden.value = v;
             const p = Math.max(1, Math.abs(parseInt((customPtsInput && customPtsInput.value) || "0", 10) || 0));
             customPtsHidden.value = String(p);
