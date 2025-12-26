@@ -55,12 +55,41 @@
     document.addEventListener('DOMContentLoaded', function() {
       var toggle = document.querySelector('.navbar-toggle');
       var nav = document.querySelector('.main-navbar');
-
       if (!toggle || !nav) return;
 
-      toggle.addEventListener('click', function() {
+      var mobileMQ = window.matchMedia('(max-width: 1024px)');
+
+      function closeNav() {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleNav(e) {
+        if (e) e.stopPropagation();
         var isOpen = nav.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      }
+
+      toggle.addEventListener('click', toggleNav);
+
+      // Close when clicking a menu item on mobile
+      nav.addEventListener('click', function(e) {
+        if (!mobileMQ.matches) return;
+        var link = e.target.closest('a.navbar-item, a.navbar-btn');
+        if (link) closeNav();
+      });
+
+      // Close when tapping outside on mobile
+      document.addEventListener('click', function(e) {
+        if (!mobileMQ.matches) return;
+        if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
+          closeNav();
+        }
+      });
+
+      // If the user resizes back to desktop, ensure it's closed
+      window.addEventListener('resize', function() {
+        if (!mobileMQ.matches) closeNav();
       });
     });
   </script>
