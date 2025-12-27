@@ -77,8 +77,20 @@
 
     .logo {
       height: 4em;
+      width: auto;              /* preserve aspect ratio */
       margin-right: 10px;
       padding: 15px;
+      display: block;
+      object-fit: contain;
+      flex: 0 0 auto;           /* don't let flexbox squash it */
+      flex-shrink: 0;
+    }
+
+    /* Prevent squished logo on narrow screens */
+    @media (max-width: 420px) {
+      .top-left { gap: 10px; }
+      .topheader { min-width: 0; }
+      .logo { height: 3.2em; padding: 10px 8px; }
     }
 
     .topheader {

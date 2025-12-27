@@ -1,6 +1,6 @@
 <?php /* views/index.php */ ?>
 
-<link rel="stylesheet" href="static/style1.css">
+<link rel="stylesheet" href="static/style1.css?v=2">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
