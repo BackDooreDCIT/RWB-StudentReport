@@ -1,7 +1,7 @@
 <?php /* views/result.php — full functional version with styling */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov6">
+<link rel="stylesheet" href="/static/log.css?v=recov7">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
@@ -77,8 +77,12 @@
             <!-- Mobile-friendly preview (wraps to multiple lines) -->
             <div class="chosen-reason" id="chosenReasonChip" style="display:none"></div>
 
-            <input type="hidden" name="reason_code" id="reasonCode">
-            <input type="hidden" name="custom_reason_detail" id="customReasonHidden">
+            <!-- NEW: Multi-select payload (JSON array) -->
+            <input type="hidden" name="reasons_json" id="reasonsJson" value="">
+
+            <!-- Backward-compatible single fields (kept to avoid breaking older pages) -->
+            <input type="hidden" name="reason_code" id="reasonCode" value="">
+            <input type="hidden" name="custom_reason_detail" id="customReasonHidden" value="">
             <input type="hidden" name="custom_points" id="customPointsHidden" value="">
             <div class="muted" id="reasonHint">เลือกเหตุผลก่อนกดบันทึก</div>
           </div>
@@ -107,7 +111,7 @@
                 <span class="modal-badge" aria-hidden="true">−</span>
                 <h3 id="reasonTitle">เลือกเหตุผลหักคะแนน</h3>
               </div>
-              <div class="modal-sub">ค้นหาแล้วกดรายการเพื่อเลือก</div>
+              <div class="modal-sub">เลือกได้หลายข้อ • กดซ้ำเพื่อยกเลิก</div>
             </div>
             <button class="icon-btn" type="button" data-close aria-label="ปิด">×</button>
           </div>
@@ -115,6 +119,18 @@
           <div class="modal-search-wrap">
             <span class="search-ico" aria-hidden="true">🔎</span>
             <input class="input modal-search" id="reasonSearch" type="text" placeholder="ค้นหา… (พิมพ์เลข/คำ เช่น 109, ทรงผม, มาสาย)">
+          </div>
+
+          <!-- Selected summary (sticky on mobile) -->
+          <div class="modal-selected" id="modalSelected" style="display:none">
+            <div class="modal-selected-row">
+              <div class="modal-selected-meta" id="modalSelectedMeta">เลือกแล้ว 0 รายการ • รวม -0</div>
+              <div class="modal-selected-actions">
+                <button class="btn ghost" type="button" id="clearSelected">ล้างทั้งหมด</button>
+                <button class="btn" type="button" id="doneSelected">เสร็จสิ้น</button>
+              </div>
+            </div>
+            <div class="modal-selected-chips" id="modalSelectedChips"></div>
           </div>
 
           <div class="modal-list" id="reasonList">
@@ -145,7 +161,7 @@
             <input class="input" id="customPointsInput" type="number" min="1" max="100" value="5">
             <div class="modal-foot-actions">
               <button class="btn ghost" type="button" id="cancelCustom">ยกเลิก</button>
-              <button class="btn" type="button" id="useCustomReason">ใช้เหตุผลนี้</button>
+              <button class="btn" type="button" id="useCustomReason">เพิ่มเข้าไป</button>
             </div>
           </div>
         </div>
@@ -177,6 +193,7 @@
           const search = document.getElementById("reasonSearch");
           const list = document.getElementById("reasonList");
           const reasonCode = document.getElementById("reasonCode");
+          const reasonsJson = document.getElementById("reasonsJson");
           const reasonDisplay = document.getElementById("reasonDisplay");
           const reasonHint = document.getElementById("reasonHint");
           const chosenChip = document.getElementById("chosenReasonChip");
@@ -188,20 +205,120 @@
           const useCustom = document.getElementById("useCustomReason");
           const cancelCustom = document.getElementById("cancelCustom");
 
-          function clearSelected(){
+          const modalSelected = document.getElementById("modalSelected");
+          const modalSelectedMeta = document.getElementById("modalSelectedMeta");
+          const modalSelectedChips = document.getElementById("modalSelectedChips");
+          const clearSelectedBtn = document.getElementById("clearSelected");
+          const doneSelectedBtn = document.getElementById("doneSelected");
+
+          // Selected reasons (multi)
+          /** @type {{code:string, desc:string, pts:number, custom_detail?:string}[]} */
+          let selected = [];
+
+          function totalPts(){
+            return selected.reduce((a, r) => a + Math.abs(parseInt(r.pts || 0, 10) || 0), 0);
+          }
+
+          function syncHidden(){
+            // Server trusts config; we still send full list for UX/preview
+            reasonsJson.value = JSON.stringify(selected);
+            // Back-compat: keep a single code (first) so older handlers don't explode
+            if (selected.length) {
+              reasonCode.value = selected[0].code;
+              if (selected[0].code === 'อื่นๆ') {
+                customHidden.value = selected[0].custom_detail || '';
+                customPtsHidden.value = String(Math.abs(parseInt(selected[0].pts || 0, 10) || 0));
+              } else {
+                customHidden.value = '';
+                customPtsHidden.value = '';
+              }
+            } else {
+              reasonCode.value = '';
+              customHidden.value = '';
+              customPtsHidden.value = '';
+            }
+          }
+
+          function renderChosen(){
+            const n = selected.length;
+            const t = totalPts();
+
+            if (!n) {
+              reasonDisplay.value = '';
+              reasonHint.textContent = 'เลือกเหตุผลก่อนกดบันทึก';
+              if (chosenChip) chosenChip.style.display = 'none';
+              if (modalSelected) modalSelected.style.display = 'none';
+              syncHidden();
+              return;
+            }
+
+            // Short summary in the input (keeps UI clean)
+            reasonDisplay.value = `เลือกแล้ว ${n} รายการ (รวม -${t})`;
+            reasonHint.textContent = `จะหักรวม ${t} คะแนน (${n} รายการ)`;
+
+            // Chips preview on the page (mobile-friendly)
+            if (chosenChip) {
+              chosenChip.style.display = '';
+              const chips = selected.map(r => {
+                const label = `${r.code} • ${r.desc} (-${Math.abs(parseInt(r.pts||0,10)||0)})`;
+                return `<span class="chip" title="${escapeHtml(label)}">${escapeHtml(r.code)} <span class="chip-sub">${escapeHtml(r.desc)}</span> <span class="chip-pts">-${Math.abs(parseInt(r.pts||0,10)||0)}</span></span>`;
+              }).join('');
+              chosenChip.innerHTML = `<div class="chips">${chips}</div><div class="meta">รวม -${t} คะแนน</div>`;
+            }
+
+            // Modal selected summary
+            if (modalSelected && modalSelectedMeta && modalSelectedChips) {
+              modalSelected.style.display = '';
+              modalSelectedMeta.textContent = `เลือกแล้ว ${n} รายการ • รวม -${t}`;
+              modalSelectedChips.innerHTML = selected.map(r => {
+                const label = `${r.code} ${r.desc} (-${Math.abs(parseInt(r.pts||0,10)||0)})`;
+                return `<button type="button" class="mchip" data-code="${escapeAttr(r.code)}" data-desc="${escapeAttr(r.desc)}" title="ลบ: ${escapeAttr(label)}">
+                          <span class="mchip-code">${escapeHtml(r.code)}</span>
+                          <span class="mchip-desc">${escapeHtml(r.desc)}</span>
+                          <span class="mchip-pts">-${Math.abs(parseInt(r.pts||0,10)||0)}</span>
+                          <span class="mchip-x" aria-hidden="true">×</span>
+                        </button>`;
+              }).join('');
+            }
+
+            syncHidden();
+          }
+
+          function escapeHtml(s){
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          }
+          function escapeAttr(s){
+            return escapeHtml(s).replace(/\s+/g,' ').trim();
+          }
+
+          function isSelected(code, desc){
+            return selected.some(r => r.code === code && r.desc === (desc||r.desc));
+          }
+
+          function toggleSelected(code, desc, pts, extra){
+            // Remove if exists
+            const idx = selected.findIndex(r => r.code === code && r.desc === desc);
+            if (idx >= 0) {
+              selected.splice(idx, 1);
+            } else {
+              selected.push({ code, desc, pts: Math.abs(parseInt(pts||0,10)||0), ...(extra||{}) });
+            }
+            markSelected();
+            renderChosen();
+          }
+
+          function clearSelectedMarks(){
             [...list.querySelectorAll(".reason-item")].forEach(b => b.classList.remove("is-selected"));
           }
 
-          function markSelected(code){
-            clearSelected();
-            if (!code) return;
-            const btn = list.querySelector(`.reason-item[data-code="${CSS.escape(code)}"]`);
-            if (!btn) return;
-            btn.classList.add("is-selected");
-            // If it's currently filtered out, make it visible
-            btn.style.display = "";
-            // Keep it in view
-            try { btn.scrollIntoView({block:"nearest"}); } catch(e) {}
+          function markSelected(){
+            clearSelectedMarks();
+            if (!selected.length) return;
+            // Mark by code (for config reasons) + keep "อื่นๆ" highlighted if any custom exists
+            selected.forEach(r => {
+              const btn = list.querySelector(`.reason-item[data-code="${CSS.escape(r.code)}"]`);
+              if (btn) btn.classList.add('is-selected');
+            });
           }
 
           function openModal(){
@@ -212,8 +329,9 @@
             customBox.style.display = "none";
             customInput.value = "";
             if (customPtsInput) customPtsInput.value = 5;
-            // Highlight previously chosen reason (if any)
-            markSelected(reasonCode.value);
+            // Highlight previously chosen reasons
+            markSelected();
+            renderChosen();
             setTimeout(() => search.focus(), 50);
           }
           function closeModal(){
@@ -241,7 +359,7 @@
           }
           search.addEventListener("input", () => filterList(search.value));
 
-          // Pick reason
+          // Pick reason (toggle; stays open)
           list.addEventListener("click", (e) => {
             const btn = e.target.closest(".reason-item");
             if (!btn) return;
@@ -251,41 +369,26 @@
             const desc = btn.dataset.desc || "";
 
             if (code === "อื่นๆ") {
-              markSelected(code);
+              markSelected();
               customBox.style.display = "";
               setTimeout(() => customInput.focus(), 50);
               return;
             }
 
-            reasonCode.value = code;
-            markSelected(code);
-            customHidden.value = "";
-            customPtsHidden.value = "";
-            // Keep the input short-ish (ellipsis handled by CSS), and show full text in the chip (better on mobile)
-            reasonDisplay.value = `${code} - ${desc} (-${pts})`;
-            if (chosenChip) {
-              chosenChip.style.display = "";
-              chosenChip.textContent = `${code} • ${desc}  (-${pts})`;
-            }
-            reasonHint.textContent = `จะหัก ${pts} คะแนน`;
-            closeModal();
+            // Toggle selection for normal reasons
+            toggleSelected(code, desc, pts);
           });
 
           function useCustomReason(){
             const v = (customInput.value || "").trim();
             if (!v) { customInput.focus(); return; }
-            reasonCode.value = "อื่นๆ";
-            markSelected("อื่นๆ");
-            customHidden.value = v;
             const p = Math.max(1, Math.abs(parseInt((customPtsInput && customPtsInput.value) || "0", 10) || 0));
-            customPtsHidden.value = String(p);
-            reasonDisplay.value = `อื่นๆ: ${v} (-${p})`;
-            if (chosenChip) {
-              chosenChip.style.display = "";
-              chosenChip.textContent = `อื่นๆ • ${v}  (-${p})`;
-            }
-            reasonHint.textContent = `จะหัก ${p} คะแนน`;
-            closeModal();
+            // Add as an entry (allow more than 1 custom if they want)
+            toggleSelected('อื่นๆ', `อื่นๆ: ${v}`, p, { custom_detail: v });
+            customBox.style.display = "none";
+            customInput.value = "";
+            if (customPtsInput) customPtsInput.value = 5;
+            search.focus();
           }
           useCustom.addEventListener("click", useCustomReason);
           cancelCustom.addEventListener("click", () => {
@@ -295,13 +398,52 @@
             search.focus();
           });
 
+          // Remove selected chip inside modal
+          if (modalSelectedChips) {
+            modalSelectedChips.addEventListener('click', (e) => {
+              const b = e.target.closest('.mchip');
+              if (!b) return;
+              const c = b.dataset.code || '';
+              const d = b.dataset.desc || '';
+              // Find exact match
+              const idx = selected.findIndex(r => r.code === c && r.desc === d);
+              if (idx >= 0) selected.splice(idx, 1);
+              markSelected();
+              renderChosen();
+            });
+          }
+
+          // Clear all
+          if (clearSelectedBtn) {
+            clearSelectedBtn.addEventListener('click', () => {
+              selected = [];
+              markSelected();
+              renderChosen();
+              customBox.style.display = 'none';
+              customInput.value = '';
+              if (customPtsInput) customPtsInput.value = 5;
+              search.focus();
+            });
+          }
+
+          // Done
+          if (doneSelectedBtn) {
+            doneSelectedBtn.addEventListener('click', () => {
+              // Close only if at least 1 reason selected
+              if (selected.length) closeModal();
+            });
+          }
+
           // Safety: block submit in deduct mode if no reason chosen
           document.getElementById("scoreForm").addEventListener("submit", (e) => {
-            if (modeInput.value === "deduct" && !reasonCode.value) {
+            if (modeInput.value === "deduct" && selected.length === 0) {
               e.preventDefault();
               openModal();
             }
           });
+
+          // Init
+          renderChosen();
         });
       </script>
     <?php else: ?>

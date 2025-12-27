@@ -411,30 +411,92 @@ if ($route === 'search') {
         $delta = abs($add_points);
         $reason_desc = "เพิ่มคะแนน: " . $add_reason;
       } else {
-        $reason_code = param('reason_code');
-        $custom_reason = trim(param('custom_reason_detail', ''));
+        // NEW: allow multi-select reasons from the modal (JSON array)
+        $reasons_json_raw = param('reasons_json', '');
 
-        if (!array_key_exists($reason_code, $REASONS)) {
-          Flash::add("รหัสเหตุผลไม่ถูกต้อง", "error");
-          Response::redirect('/?route=search&studentID=' . urlencode($student_id));
-        }
-
-        list($desc, $pts) = $REASONS[$reason_code];
-        $pts = intval($pts);
-
-        if ($reason_code === 'อื่นๆ') {
-          if ($custom_reason === '') {
-            Flash::add("กรุณากรอกรายละเอียดเหตุผล", "error");
+        if ($reasons_json_raw !== '') {
+          $items = json_decode($reasons_json_raw, true);
+          if (!is_array($items) || count($items) === 0) {
+            Flash::add("กรุณาเลือกเหตุผลอย่างน้อย 1 ข้อ", "error");
             Response::redirect('/?route=search&studentID=' . urlencode($student_id));
           }
-          $desc = "อื่นๆ: " . $custom_reason;
-          $custom_pts = intval(param('custom_points', 0));
-          if ($custom_pts <= 0) { $custom_pts = 5; }
-          $pts = abs($custom_pts);
-        }
 
-        $delta = -abs($pts);
-        $reason_desc = ($desc !== '' ? $desc : $reason_code);
+          $total = 0;
+          $desc_list = [];
+
+          foreach ($items as $it) {
+            if (!is_array($it)) continue;
+            $code = trim((string)($it['code'] ?? ''));
+            if ($code === '') continue;
+
+            if ($code === 'อื่นๆ') {
+              $custom_detail = trim((string)($it['custom_detail'] ?? $it['detail'] ?? ''));
+              if ($custom_detail === '') {
+                // allow fallback from legacy hidden input
+                $custom_detail = trim(param('custom_reason_detail', ''));
+              }
+              if ($custom_detail === '') {
+                Flash::add("กรุณากรอกรายละเอียดเหตุผล (อื่นๆ)", "error");
+                Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+              }
+
+              $pts = intval($it['pts'] ?? 0);
+              if ($pts <= 0) {
+                $legacy_pts = intval(param('custom_points', 0));
+                $pts = $legacy_pts > 0 ? $legacy_pts : 5;
+              }
+              $pts = abs($pts);
+
+              $total += $pts;
+              $desc_list[] = "อื่นๆ: " . $custom_detail . " (-" . $pts . ")";
+            } else {
+              if (!array_key_exists($code, $REASONS)) {
+                Flash::add("รหัสเหตุผลไม่ถูกต้อง: " . htmlspecialchars($code), "error");
+                Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+              }
+              list($desc, $pts) = $REASONS[$code];
+              $pts = abs(intval($pts));
+
+              $total += $pts;
+              $desc_list[] = $code . ": " . $desc . " (-" . $pts . ")";
+            }
+          }
+
+          if ($total <= 0 || count($desc_list) === 0) {
+            Flash::add("กรุณาเลือกเหตุผลอย่างน้อย 1 ข้อ", "error");
+            Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+          }
+
+          $delta = -abs($total);
+          $reason_desc = implode(' / ', $desc_list);
+
+        } else {
+          // Legacy single-select
+          $reason_code = param('reason_code');
+          $custom_reason = trim(param('custom_reason_detail', ''));
+
+          if (!array_key_exists($reason_code, $REASONS)) {
+            Flash::add("รหัสเหตุผลไม่ถูกต้อง", "error");
+            Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+          }
+
+          list($desc, $pts) = $REASONS[$reason_code];
+          $pts = intval($pts);
+
+          if ($reason_code === 'อื่นๆ') {
+            if ($custom_reason === '') {
+              Flash::add("กรุณากรอกรายละเอียดเหตุผล", "error");
+              Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+            }
+            $desc = "อื่นๆ: " . $custom_reason;
+            $custom_pts = intval(param('custom_points', 0));
+            if ($custom_pts <= 0) { $custom_pts = 5; }
+            $pts = abs($custom_pts);
+          }
+
+          $delta = -abs($pts);
+          $reason_desc = ($desc !== '' ? $desc : $reason_code);
+        }
       }
 
 $current_score = intval($student['score'] ?? 0);        $new_score = $current_score + $delta; // negatives allowed

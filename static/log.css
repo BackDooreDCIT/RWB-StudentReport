@@ -181,6 +181,39 @@ input[type="date"].input { padding: 9px 11px; }
   word-break: break-word;
 }
 
+/* Multi-selected reasons chips (on the page) */
+.chosen-reason .chips{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chosen-reason .chip{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.10);
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  font-weight: 800;
+  font-size: 13px;
+  max-width: 100%;
+}
+.chosen-reason .chip-sub{
+  font-weight: 700;
+  opacity: .85;
+}
+.chosen-reason .chip-pts{
+  font-weight: 900;
+  opacity: .85;
+}
+.chosen-reason .meta{
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: .70;
+}
+
 .btn.ghost{
   background: rgba(0,0,0,.06);
   color: inherit;
@@ -296,6 +329,55 @@ input[type="date"].input { padding: 9px 11px; }
   box-shadow: none !important;
   padding: 0 !important;
 }
+
+/* Selected summary inside modal */
+.modal-selected{
+  margin: 2px 16px 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 10px 24px rgba(0,0,0,.10);
+}
+.modal-selected-row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.modal-selected-meta{
+  font-weight: 800;
+  font-size: 13px;
+  opacity: .75;
+}
+.modal-selected-actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.modal-selected-chips{
+  margin-top: 10px;
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mchip{
+  border: 0;
+  cursor: pointer;
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.05);
+  transition: background .12s ease, transform .12s ease;
+}
+.mchip:hover{ background: rgba(0,0,0,.08); transform: translateY(-1px); }
+.mchip:active{ transform: translateY(0); }
+.mchip-code{ font-weight: 900; }
+.mchip-desc{ opacity: .80; font-weight: 700; }
+.mchip-pts{ font-weight: 900; opacity: .80; }
+.mchip-x{ opacity: .65; font-weight: 900; }
 
 .modal-list{
   padding: 12px 12px 14px;
@@ -429,6 +511,17 @@ input[type="date"].input { padding: 9px 11px; }
     z-index: 2;
     margin: 10px 12px 10px;
   }
+
+  .modal-selected{
+    position: sticky;
+    top: 112px; /* below head + search */
+    z-index: 2;
+    margin: 0 12px 10px;
+  }
+
+  .modal-selected-row{ align-items: flex-start; }
+  .modal-selected-actions{ width: 100%; justify-content: flex-end; }
+  .modal-selected-actions .btn{ padding: 10px 12px; }
   .modal-list{ padding: 0 8px 12px; }
 
   .reason-item{ grid-template-columns: 72px 1fr 62px; padding: 14px 12px; }
