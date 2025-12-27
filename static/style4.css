@@ -171,3 +171,24 @@
     padding: 6px 12px;
   }
 }
+
+
+/* === Logo sizing fix v3 (keep logo big, never squished) === */
+.top-left .logo{
+  width: auto !important;           /* override img{width:100%} */
+  height: clamp(64px, 18vw, 110px) !important;
+  max-width: none !important;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+}
+
+/* On very small screens, keep it readable but not huge */
+@media (max-width: 420px){
+  .top-left .logo{
+    height: clamp(64px, 22vw, 100px) !important;
+    padding: 12px 10px !important;
+  }
+}
+
