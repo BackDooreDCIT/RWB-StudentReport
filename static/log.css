@@ -187,6 +187,21 @@ input[type="date"].input { padding: 9px 11px; }
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* Default: keep the preview compact. JS toggles .is-expanded when user opens “+N more”. */
+.chosen-reason.is-collapsed .chips{
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+}
+.chosen-reason.is-collapsed .chip{ flex: 0 0 auto; max-width: 280px; }
+.chosen-reason.is-collapsed .chip-sub{
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .chosen-reason .chip{
   display:inline-flex;
   align-items:center;
@@ -199,6 +214,11 @@ input[type="date"].input { padding: 9px 11px; }
   font-weight: 800;
   font-size: 13px;
   max-width: 100%;
+}
+.chosen-reason .chip.chip-more{
+  cursor: pointer;
+  background: rgba(0,0,0,.07);
+  border-style: dashed;
 }
 .chosen-reason .chip-sub{
   font-weight: 700;
@@ -223,7 +243,8 @@ input[type="date"].input { padding: 9px 11px; }
   position: fixed;
   inset: 0;
   display:none;
-  z-index: 9999;
+  /* Desktop: sit above everything */
+  z-index: 20000;
 }
 .modal.is-open{ display:block; }
 
@@ -251,6 +272,12 @@ input[type="date"].input { padding: 9px 11px; }
   animation: modalDrop .22s ease forwards;
   display:flex;
   flex-direction: column;
+}
+
+/* Ensure scroll areas behave inside a flex modal (prevents list getting blocked) */
+.modal-list{
+  flex: 1 1 auto;
+  min-height: 0; /* critical so overflow:auto can actually scroll in flex */
 }
 
 @keyframes modalFade{
@@ -345,11 +372,23 @@ input[type="date"].input { padding: 9px 11px; }
   justify-content: space-between;
   gap: 12px;
 }
+.modal-selected-left{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 0;
+}
 .modal-selected-meta{
   font-weight: 800;
   font-size: 13px;
   opacity: .75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+.selected-toggle{ display: none; }
+.modal-selected.is-collapsed .modal-selected-chips{ display: none; }
+.modal-selected.is-collapsed #clearSelected{ display: none; }
 .modal-selected-actions{
   display:flex;
   gap: 10px;
@@ -360,7 +399,33 @@ input[type="date"].input { padding: 9px 11px; }
   display:flex;
   flex-wrap: wrap;
   gap: 8px;
+  /* prevent the modal from being taken over when a ton of reasons are selected */
+  max-height: 160px;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
+
+/* Collapsed (default) view: keep it compact + one line */
+.modal-selected:not(.is-expanded) .modal-selected-chips{
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 52px;
+}
+.modal-selected:not(.is-expanded) .mchip{
+  flex: 0 0 auto;
+  max-width: 260px;
+}
+.modal-selected:not(.is-expanded) .mchip-desc{
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-selected-chips::-webkit-scrollbar{ height: 10px; width: 10px; }
+.modal-selected-chips::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.16); border-radius: 999px; }
+.modal-selected-chips::-webkit-scrollbar-track{ background: rgba(0,0,0,.04); border-radius: 999px; }
 .mchip{
   border: 0;
   cursor: pointer;
@@ -375,9 +440,26 @@ input[type="date"].input { padding: 9px 11px; }
 .mchip:hover{ background: rgba(0,0,0,.08); transform: translateY(-1px); }
 .mchip:active{ transform: translateY(0); }
 .mchip-code{ font-weight: 900; }
-.mchip-desc{ opacity: .80; font-weight: 700; }
+.mchip-desc{ opacity: .80; font-weight: 700; min-width: 0; }
 .mchip-pts{ font-weight: 900; opacity: .80; }
 .mchip-x{ opacity: .65; font-weight: 900; }
+
+.mchip-more{
+  background: rgba(0,0,0,.08);
+  font-weight: 900;
+}
+.mchip-more:hover{ background: rgba(0,0,0,.12); }
+.mchip-more:active{ transform: translateY(0); }
+
+/* Expanded selected chips area gets a bit more room, but stays scrollable */
+.modal-selected.is-expanded .modal-selected-chips{
+  max-height: 260px;
+}
+@media (max-width: 520px){
+  .modal-selected.is-expanded .modal-selected-chips{
+    max-height: 34vh;
+  }
+}
 
 .modal-list{
   padding: 12px 12px 14px;
@@ -473,20 +555,29 @@ input[type="date"].input { padding: 9px 11px; }
   justify-content:flex-end;
 }
 
-@media (max-width: 520px){
+/* Mobile/tablet sizing: some environments can render a "phone" viewport wider than expected,
+   which makes a strict 520px breakpoint miss and the modal appears tiny.
+   Use a safer breakpoint + !important overrides so it always becomes a usable sheet. */
+@media (max-width: 900px){
+  /* On mobile, keep the navbar visible (modal starts below it) */
+  .modal{
+    inset: 70px 0 0 0; /* navbar height */
+    z-index: 9000; /* below navbar (z-index: 10000) */
+  }
   /* Make the picker less cramped */
   .picker-row{ flex-direction: column; align-items: stretch; }
   .picker-row .btn{ width: 100%; }
 
-  /* Reduce subpixel transform blur on mobile by avoiding translateX(-50%) */
+  /* Mobile: make the modal a near-fullscreen sheet (more usable space) */
   .modal-panel{
-    left: 14px;
-    right: 14px;
-    top: 86px;     /* below navbar */
-    bottom: 14px;
-    width: auto;
-    max-height: none;
-    transform: translateY(12px);
+    left: 12px !important;
+    right: 12px !important;
+    top: 12px !important;
+    bottom: 12px !important;
+    width: auto !important;
+    max-height: none !important;
+    transform: translate3d(0, 10px, 0) !important;
+    border-radius: 16px;
     animation: modalDropMobile .22s ease forwards;
   }
 
@@ -497,6 +588,7 @@ input[type="date"].input { padding: 9px 11px; }
     background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
     z-index: 2;
     box-shadow: 0 10px 22px rgba(0,0,0,.10);
+    padding: 12px 14px;
   }
   .modal-search{
     position: sticky;
@@ -509,22 +601,45 @@ input[type="date"].input { padding: 9px 11px; }
     position: sticky;
     top: 56px;
     z-index: 2;
-    margin: 10px 12px 10px;
+    margin: 8px 10px 8px;
+    padding: 8px 10px;
+    border-radius: 14px;
   }
 
   .modal-selected{
     position: sticky;
-    top: 112px; /* below head + search */
+    top: 104px; /* below head + search */
     z-index: 2;
-    margin: 0 12px 10px;
+    margin: 0 10px 8px;
+    /* when many reasons are selected, don't let the chips block the whole modal */
+    max-height: 180px;
+    overflow: hidden;
   }
 
-  .modal-selected-row{ align-items: flex-start; }
-  .modal-selected-actions{ width: 100%; justify-content: flex-end; }
-  .modal-selected-actions .btn{ padding: 10px 12px; }
+  /* Collapse selected reasons to a single-line summary on mobile */
+  .selected-toggle{ display: inline-flex; padding: 8px 10px; }
+  .modal-selected-row{ flex-wrap: nowrap; align-items: center; }
+  .modal-selected-actions{ flex-wrap: nowrap; gap: 8px; }
+  .modal-selected-actions .btn{ padding: 8px 10px; font-size: 13px; }
+
+  .modal-selected-chips{
+    max-height: 120px;
+    overflow: auto;
+    padding-bottom: 2px;
+    overscroll-behavior: contain;
+  }
+
+  .modal-selected-chips::-webkit-scrollbar{ height: 10px; width: 10px; }
+  .modal-selected-chips::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.16); border-radius: 999px; }
+  .modal-selected-chips::-webkit-scrollbar-track{ background: rgba(0,0,0,.04); border-radius: 999px; }
+
+  /* When expanded, let the action buttons wrap if needed */
+  .modal-selected:not(.is-collapsed) .modal-selected-row{ align-items: flex-start; }
+  .modal-selected:not(.is-collapsed) .modal-selected-actions{ width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+  .modal-selected:not(.is-collapsed) .modal-selected-actions .btn{ padding: 10px 12px; }
   .modal-list{ padding: 0 8px 12px; }
 
-  .reason-item{ grid-template-columns: 72px 1fr 62px; padding: 14px 12px; }
+  .reason-item{ grid-template-columns: 64px 1fr 56px; padding: 12px 12px; }
   .reason-code{ font-size: 14px; }
   .reason-desc{ font-size: 14px; }
   .reason-pts{ font-size: 14px; }

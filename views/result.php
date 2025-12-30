@@ -1,7 +1,7 @@
 <?php /* views/result.php — full functional version with styling */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov7">
+<link rel="stylesheet" href="/static/log.css?v=recov13">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
@@ -124,7 +124,10 @@
           <!-- Selected summary (sticky on mobile) -->
           <div class="modal-selected" id="modalSelected" style="display:none">
             <div class="modal-selected-row">
-              <div class="modal-selected-meta" id="modalSelectedMeta">เลือกแล้ว 0 รายการ • รวม -0</div>
+              <div class="modal-selected-left">
+                <div class="modal-selected-meta" id="modalSelectedMeta">เลือกแล้ว 0 รายการ • รวม -0</div>
+                <button class="btn ghost selected-toggle" type="button" id="toggleSelected" aria-expanded="false">ดูรายการ</button>
+              </div>
               <div class="modal-selected-actions">
                 <button class="btn ghost" type="button" id="clearSelected">ล้างทั้งหมด</button>
                 <button class="btn" type="button" id="doneSelected">เสร็จสิ้น</button>
@@ -208,10 +211,74 @@
           const modalSelected = document.getElementById("modalSelected");
           const modalSelectedMeta = document.getElementById("modalSelectedMeta");
           const modalSelectedChips = document.getElementById("modalSelectedChips");
+          const toggleSelectedBtn = document.getElementById("toggleSelected");
           const clearSelectedBtn = document.getElementById("clearSelected");
           const doneSelectedBtn = document.getElementById("doneSelected");
 
-          // Selected reasons (multi)
+          // Selected chips preview (show a few chips + “+N more”, expandable)
+          const previewMQ = window.matchMedia("(max-width: 520px)");
+          let selectedExpanded = false;
+          let chosenExpanded = false;
+
+          function getPreviewLimit(){
+            return previewMQ.matches ? 2 : 3;
+          }
+
+          function setSelectedExpanded(v){
+            selectedExpanded = !!v;
+            if (modalSelected) modalSelected.classList.toggle("is-expanded", selectedExpanded);
+            if (modalSelected) modalSelected.classList.remove("is-collapsed"); // legacy class safety
+          }
+
+          function setChosenExpanded(v){
+            chosenExpanded = !!v;
+            if (chosenChip){
+              chosenChip.classList.toggle("is-expanded", chosenExpanded);
+              chosenChip.classList.toggle("is-collapsed", !chosenExpanded);
+            }
+          }
+
+          function updateSelectedToggleUI(){
+            const n = selected.length;
+            const limit = getPreviewLimit();
+            const hasMore = n > limit;
+
+            // Keep the old toggle button as a backup control (mobile only)
+            if (toggleSelectedBtn){
+              const show = previewMQ.matches && hasMore;
+              toggleSelectedBtn.style.display = show ? "" : "none";
+              toggleSelectedBtn.textContent = selectedExpanded ? "ซ่อนรายการ" : `ดูรายการ (${n})`;
+              toggleSelectedBtn.setAttribute("aria-expanded", String(selectedExpanded));
+            }
+          }
+
+          // Toggle expand/collapse via the (optional) button / meta click
+          if (toggleSelectedBtn) {
+            toggleSelectedBtn.addEventListener("click", () => {
+              setSelectedExpanded(!selectedExpanded);
+              renderChosen();
+            });
+          }
+          if (modalSelectedMeta) {
+            modalSelectedMeta.addEventListener("click", () => {
+              const hasMore = selected.length > getPreviewLimit();
+              if (!hasMore) return;
+              // Only treat meta as toggle on mobile
+              if (!previewMQ.matches) return;
+              setSelectedExpanded(!selectedExpanded);
+              renderChosen();
+            });
+          }
+
+          // Reset expansion when switching breakpoints
+          const onPreviewChange = () => {
+            setSelectedExpanded(false);
+            setChosenExpanded(false);
+            renderChosen();
+          };
+          if (previewMQ.addEventListener) previewMQ.addEventListener("change", onPreviewChange);
+          else if (previewMQ.addListener) previewMQ.addListener(onPreviewChange);
+// Selected reasons (multi)
           /** @type {{code:string, desc:string, pts:number, custom_detail?:string}[]} */
           let selected = [];
 
@@ -248,6 +315,9 @@
               reasonHint.textContent = 'เลือกเหตุผลก่อนกดบันทึก';
               if (chosenChip) chosenChip.style.display = 'none';
               if (modalSelected) modalSelected.style.display = 'none';
+              setSelectedExpanded(false);
+              setChosenExpanded(false);
+              updateSelectedToggleUI();
               syncHidden();
               return;
             }
@@ -259,18 +329,33 @@
             // Chips preview on the page (mobile-friendly)
             if (chosenChip) {
               chosenChip.style.display = '';
-              const chips = selected.map(r => {
+              const limit = getPreviewLimit();
+              const hasMore = selected.length > limit;
+              const shown = chosenExpanded ? selected : selected.slice(0, limit);
+
+              const chips = shown.map(r => {
                 const label = `${r.code} • ${r.desc} (-${Math.abs(parseInt(r.pts||0,10)||0)})`;
                 return `<span class="chip" title="${escapeHtml(label)}">${escapeHtml(r.code)} <span class="chip-sub">${escapeHtml(r.desc)}</span> <span class="chip-pts">-${Math.abs(parseInt(r.pts||0,10)||0)}</span></span>`;
               }).join('');
-              chosenChip.innerHTML = `<div class="chips">${chips}</div><div class="meta">รวม -${t} คะแนน</div>`;
+              const more = hasMore
+                ? (chosenExpanded
+                    ? `<button type="button" class="chip chip-more" data-action="collapse" title="ย่อรายการ">ย่อรายการ</button>`
+                    : `<button type="button" class="chip chip-more" data-action="expand" title="ดูเพิ่ม">+${selected.length - limit} เพิ่มเติม</button>`)
+                : '';
+
+              setChosenExpanded(chosenExpanded);
+              chosenChip.innerHTML = `<div class="chips">${chips}${more}</div><div class="meta">รวม -${t} คะแนน • แตะเพื่อแก้ไข</div>`;
             }
 
             // Modal selected summary
             if (modalSelected && modalSelectedMeta && modalSelectedChips) {
               modalSelected.style.display = '';
               modalSelectedMeta.textContent = `เลือกแล้ว ${n} รายการ • รวม -${t}`;
-              modalSelectedChips.innerHTML = selected.map(r => {
+              const limit = getPreviewLimit();
+              const hasMore = selected.length > limit;
+              const shown = selectedExpanded ? selected : selected.slice(0, limit);
+
+              const chipsHtml = shown.map(r => {
                 const label = `${r.code} ${r.desc} (-${Math.abs(parseInt(r.pts||0,10)||0)})`;
                 return `<button type="button" class="mchip" data-code="${escapeAttr(r.code)}" data-desc="${escapeAttr(r.desc)}" title="ลบ: ${escapeAttr(label)}">
                           <span class="mchip-code">${escapeHtml(r.code)}</span>
@@ -279,6 +364,14 @@
                           <span class="mchip-x" aria-hidden="true">×</span>
                         </button>`;
               }).join('');
+              let moreHtml = "";
+              if (hasMore) {
+                moreHtml = selectedExpanded
+                  ? `<button type="button" class="mchip mchip-more" data-action="collapse" title="ย่อรายการ">ย่อรายการ</button>`
+                  : `<button type="button" class="mchip mchip-more" data-action="expand" title="ดูเพิ่ม">+${selected.length - limit} เพิ่มเติม</button>`;
+              }
+              modalSelectedChips.innerHTML = chipsHtml + moreHtml;
+              updateSelectedToggleUI();
             }
 
             syncHidden();
@@ -324,6 +417,8 @@
           function openModal(){
             modal.classList.add("is-open");
             modal.setAttribute("aria-hidden","false");
+            // Start collapsed on mobile so the list isn't blocked when many items are selected
+            setSelectedExpanded(false);
             search.value = "";
             filterList("");
             customBox.style.display = "none";
@@ -345,6 +440,20 @@
             if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
           });
           openBtn.addEventListener("click", openModal);
+
+          // Page preview chips: collapse to a few + “+N more”. Click to expand/collapse or open the modal.
+          if (chosenChip) {
+            chosenChip.addEventListener("click", (e) => {
+              const act = e.target.closest("[data-action]");
+              if (act) {
+                e.preventDefault();
+                setChosenExpanded(act.dataset.action === "expand");
+                renderChosen();
+                return;
+              }
+              openModal();
+            });
+          }
 
           // Filter
           function norm(s){ return (s || "").toString().toLowerCase().trim(); }
@@ -403,6 +512,16 @@
             modalSelectedChips.addEventListener('click', (e) => {
               const b = e.target.closest('.mchip');
               if (!b) return;
+
+              // “+N more” / “collapse” chip
+              if (b.classList.contains('mchip-more')) {
+                const act = b.dataset.action || '';
+                if (act === 'expand') setSelectedExpanded(true);
+                if (act === 'collapse') setSelectedExpanded(false);
+                renderChosen();
+                return;
+              }
+
               const c = b.dataset.code || '';
               const d = b.dataset.desc || '';
               // Find exact match
