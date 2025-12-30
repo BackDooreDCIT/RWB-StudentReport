@@ -61,7 +61,7 @@ input[type="date"].input { padding: 9px 11px; }
 .nice-table { width:100%; border-collapse: separate; border-spacing: 0; font-size: 14.5px; }
 .nice-table thead th {
   text-align:left; font-weight:800; padding: 12px 14px; background:#f3f4f6; border-bottom:1px solid var(--border);
-  position: sticky; top: 0; z-index:1;
+  position: relative; top: auto; z-index:1;
 }
 .nice-table tbody td { padding: 12px 14px; border-top:1px solid var(--border); vertical-align: middle; }
 .nice-table tbody tr:nth-child(even){ background:#fafafa; }
@@ -167,7 +167,7 @@ input[type="date"].input { padding: 9px 11px; }
 /* Keep the readonly display tidy (long reasons) */
 #reasonDisplay{
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
 }
 
@@ -295,6 +295,9 @@ input[type="date"].input { padding: 9px 11px; }
   padding: 16px 18px;
   background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
   border-bottom: 1px solid rgba(0,0,0,.08);
+  /* This sits above the scrollable list; don't let flexbox shrink it on tiny screens */
+  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 .modal-title{ display:flex; flex-direction:column; gap:2px; }
 .modal-title-row{ display:flex; align-items:center; gap:10px; }
@@ -332,6 +335,8 @@ input[type="date"].input { padding: 9px 11px; }
 
 /* Search bar (inside a pill wrapper) */
 .modal-search-wrap{
+  flex: 0 0 auto;
+  flex-shrink: 0;
   margin: 12px 16px 10px;
   display:flex;
   align-items:center;
@@ -359,6 +364,9 @@ input[type="date"].input { padding: 9px 11px; }
 
 /* Selected summary inside modal */
 .modal-selected{
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  min-height: 54px;
   margin: 2px 16px 10px;
   padding: 10px 12px;
   border-radius: 16px;
@@ -399,6 +407,7 @@ input[type="date"].input { padding: 9px 11px; }
   display:flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-height: 44px;
   /* prevent the modal from being taken over when a ton of reasons are selected */
   max-height: 160px;
   overflow: auto;
@@ -409,8 +418,9 @@ input[type="date"].input { padding: 9px 11px; }
 .modal-selected:not(.is-expanded) .modal-selected-chips{
   flex-wrap: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
-  max-height: 52px;
+  overflow-y: visible;
+  max-height: none;
+  padding-bottom: 2px;
 }
 .modal-selected:not(.is-expanded) .mchip{
   flex: 0 0 auto;
@@ -426,6 +436,22 @@ input[type="date"].input { padding: 9px 11px; }
 .modal-selected-chips::-webkit-scrollbar{ height: 10px; width: 10px; }
 .modal-selected-chips::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.16); border-radius: 999px; }
 .modal-selected-chips::-webkit-scrollbar-track{ background: rgba(0,0,0,.04); border-radius: 999px; }
+
+/* Override global mobile button styles inside the modal (mobile.css makes all buttons tall) */
+.modal .mchip{
+  min-height: 30px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.modal .mchip-x{
+  min-height: 0;
+  padding: 0;
+}
+.modal .icon-btn{
+  min-height: 0;
+  padding: 0;
+}
+
 .mchip{
   border: 0;
   cursor: pointer;
@@ -544,6 +570,8 @@ input[type="date"].input { padding: 9px 11px; }
 .reason-item.other .reason-pts{ opacity:.55; }
 
 .modal-foot{
+  flex: 0 0 auto;
+  flex-shrink: 0;
   padding: 12px 16px 16px;
   border-top: 1px solid rgba(0,0,0,.08);
   background: linear-gradient(180deg, rgba(0,0,0,.02) 0%, rgba(0,0,0,.04) 100%);
@@ -574,6 +602,10 @@ input[type="date"].input { padding: 9px 11px; }
     right: 12px !important;
     top: 12px !important;
     bottom: 12px !important;
+    transform: none !important;
+    width: auto !important;
+    max-height: none !important;
+    height: auto !important;
     width: auto !important;
     max-height: none !important;
     transform: translate3d(0, 10px, 0) !important;
@@ -583,7 +615,7 @@ input[type="date"].input { padding: 9px 11px; }
 
   /* Sticky header + search to keep things usable on small screens */
   .modal-head{
-    position: sticky;
+    position: relative;
     top: 0;
     background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
     z-index: 2;
@@ -591,15 +623,15 @@ input[type="date"].input { padding: 9px 11px; }
     padding: 12px 14px;
   }
   .modal-search{
-    position: sticky;
-    top: 56px;
+    position: relative;
+    top: auto;
     z-index: 2;
     background: #fff;
     margin: 0;
   }
   .modal-search-wrap{
-    position: sticky;
-    top: 56px;
+    position: relative;
+    top: auto;
     z-index: 2;
     margin: 8px 10px 8px;
     padding: 8px 10px;
@@ -607,13 +639,13 @@ input[type="date"].input { padding: 9px 11px; }
   }
 
   .modal-selected{
-    position: sticky;
-    top: 104px; /* below head + search */
+    position: relative;
+    top: auto; /* below head + search */
     z-index: 2;
     margin: 0 10px 8px;
     /* when many reasons are selected, don't let the chips block the whole modal */
-    max-height: 180px;
-    overflow: hidden;
+    max-height: none;
+    overflow: visible;
   }
 
   /* Collapse selected reasons to a single-line summary on mobile */
@@ -648,3 +680,102 @@ input[type="date"].input { padding: 9px 11px; }
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+
+/* ===== v20: Mobile polish for selected reasons (chips) ===== */
+@media (max-width: 900px){
+  /* The +N chip already expands/collapses the list — hide the extra “ดูรายการ” toggle to save space */
+  .modal .selected-toggle{ display:none !important; }
+
+  .modal-selected{
+    margin: 0 10px 10px !important;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.08) !important;
+  }
+
+  .modal-selected-row{
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  /* Let the meta take 2 lines if needed (prevents ugly clipping) */
+  .modal-selected-meta{
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    opacity: .72 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+  }
+
+  /* Action buttons: compact, not giant (override mobile.css global button sizing) */
+  .modal .modal-selected-actions .btn,
+  .modal .modal-selected-actions button{
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+  }
+  .modal #doneSelected{ padding: 6px 12px !important; }
+
+  /* Chips area: clean “tray” + horizontal in collapsed mode */
+  .modal-selected-chips{
+    margin-top: 8px !important;
+    padding: 6px !important;
+    border-radius: 12px !important;
+    background: rgba(0,0,0,.035) !important;
+    border: 1px solid rgba(0,0,0,.06) !important;
+    max-height: none !important;
+  }
+
+  .modal-selected:not(.is-expanded) .modal-selected-chips{
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modal chips: override mobile.css global button sizing so they don’t become huge */
+  .modal .mchip{
+    min-height: 30px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(0,0,0,.10) !important;
+    background: rgba(255,255,255,.90) !important;
+    gap: 6px !important;
+  }
+  .modal .mchip-code{ font-size: 12px !important; }
+  .modal .mchip-desc{
+    font-size: 12px !important;
+    max-width: 140px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .modal .mchip-pts{ font-size: 12px !important; }
+
+  .modal .mchip-x{
+    font-size: 14px !important;
+    margin-left: 6px !important;
+  }
+
+  .modal .mchip-more{
+    background: rgba(0,0,0,.06) !important;
+    border-style: dashed !important;
+    font-weight: 900 !important;
+  }
+
+  /* Also keep the on-page chosen chips compact on mobile */
+  .chosen-reason .chip{
+    min-height: 30px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+  .chosen-reason .chips{ gap: 6px !important; }
+}
+
