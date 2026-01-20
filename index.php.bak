@@ -408,7 +408,7 @@ if ($route === 'search') {
           Response::redirect('/?route=search&studentID=' . urlencode($student_id));
         }
 
-        $delta = -abs($add_points);
+        $delta = abs($add_points);
         $reason_desc = "เพิ่มคะแนน: " . $add_reason;
       } else {
         // NEW: allow multi-select reasons from the modal (JSON array)
@@ -467,7 +467,7 @@ if ($route === 'search') {
             Response::redirect('/?route=search&studentID=' . urlencode($student_id));
           }
 
-          $delta = abs($total);
+          $delta = -abs($total);
           $reason_desc = implode(' / ', $desc_list);
 
         } else {
@@ -494,7 +494,7 @@ if ($route === 'search') {
             $pts = abs($custom_pts);
           }
 
-          $delta = abs($pts);
+          $delta = -abs($pts);
           $reason_desc = ($desc !== '' ? $desc : $reason_code);
         }
       }
