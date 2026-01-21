@@ -54,6 +54,25 @@ input[type="date"].input { padding: 9px 11px; }
 .btn.ghost { background:#fff; color: var(--text); border:1px solid var(--border); box-shadow:none; }
 .btn.small { padding: 6px 10px; font-size: 13px; white-space:nowrap; }
 
+.btn:disabled, .btn[disabled] {
+  opacity: .7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Loading state for submit buttons (prevents double click) */
+.btn.is-loading::after {
+  content: "";
+  width: 14px; height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: btnspin .8s linear infinite;
+}
+
+@keyframes btnspin { to { transform: rotate(360deg); } }
+
 /* --- Table --- */
 .table-card { padding-top: 8px; }
 .table-head { display:flex; align-items:center; justify-content:space-between; margin: 8px 0 6px; color: var(--muted); }
@@ -680,3 +699,102 @@ input[type="date"].input { padding: 9px 11px; }
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+
+/* ===== v20: Mobile polish for selected reasons (chips) ===== */
+@media (max-width: 900px){
+  /* The +N chip already expands/collapses the list — hide the extra “ดูรายการ” toggle to save space */
+  .modal .selected-toggle{ display:none !important; }
+
+  .modal-selected{
+    margin: 0 10px 10px !important;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.08) !important;
+  }
+
+  .modal-selected-row{
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  /* Let the meta take 2 lines if needed (prevents ugly clipping) */
+  .modal-selected-meta{
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    opacity: .72 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+  }
+
+  /* Action buttons: compact, not giant (override mobile.css global button sizing) */
+  .modal .modal-selected-actions .btn,
+  .modal .modal-selected-actions button{
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+  }
+  .modal #doneSelected{ padding: 6px 12px !important; }
+
+  /* Chips area: clean “tray” + horizontal in collapsed mode */
+  .modal-selected-chips{
+    margin-top: 8px !important;
+    padding: 6px !important;
+    border-radius: 12px !important;
+    background: rgba(0,0,0,.035) !important;
+    border: 1px solid rgba(0,0,0,.06) !important;
+    max-height: none !important;
+  }
+
+  .modal-selected:not(.is-expanded) .modal-selected-chips{
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modal chips: override mobile.css global button sizing so they don’t become huge */
+  .modal .mchip{
+    min-height: 30px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(0,0,0,.10) !important;
+    background: rgba(255,255,255,.90) !important;
+    gap: 6px !important;
+  }
+  .modal .mchip-code{ font-size: 12px !important; }
+  .modal .mchip-desc{
+    font-size: 12px !important;
+    max-width: 140px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .modal .mchip-pts{ font-size: 12px !important; }
+
+  .modal .mchip-x{
+    font-size: 14px !important;
+    margin-left: 6px !important;
+  }
+
+  .modal .mchip-more{
+    background: rgba(0,0,0,.06) !important;
+    border-style: dashed !important;
+    font-weight: 900 !important;
+  }
+
+  /* Also keep the on-page chosen chips compact on mobile */
+  .chosen-reason .chip{
+    min-height: 30px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+  .chosen-reason .chips{ gap: 6px !important; }
+}
+

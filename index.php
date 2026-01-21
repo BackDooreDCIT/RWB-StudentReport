@@ -408,7 +408,7 @@ if ($route === 'search') {
           Response::redirect('/?route=search&studentID=' . urlencode($student_id));
         }
 
-        $delta = -abs($add_points);
+        $delta = abs($add_points);
         $reason_desc = "เพิ่มคะแนน: " . $add_reason;
       } else {
         // NEW: allow multi-select reasons from the modal (JSON array)
@@ -467,7 +467,7 @@ if ($route === 'search') {
             Response::redirect('/?route=search&studentID=' . urlencode($student_id));
           }
 
-          $delta = abs($total);
+          $delta = -abs($total);
           $reason_desc = implode(' / ', $desc_list);
 
         } else {
@@ -494,9 +494,36 @@ if ($route === 'search') {
             $pts = abs($custom_pts);
           }
 
-          $delta = abs($pts);
+          $delta = -abs($pts);
           $reason_desc = ($desc !== '' ? $desc : $reason_code);
         }
+      }
+
+      // --- Anti double-submit ---
+      // Some users may click submit multiple times while the request is processing.
+      // We generate a per-render token in the form and block repeated tokens here.
+      $req_token = trim((string)param('request_token', ''));
+      if ($req_token !== '') {
+        if (!isset($_SESSION['score_request_tokens']) || !is_array($_SESSION['score_request_tokens'])) {
+          $_SESSION['score_request_tokens'] = [];
+        }
+        // Cleanup old tokens (15 minutes)
+        $now = time();
+        foreach ($_SESSION['score_request_tokens'] as $t => $meta) {
+          $ts = is_array($meta) ? intval($meta['ts'] ?? 0) : 0;
+          if ($ts <= 0 || ($now - $ts) > 900) {
+            unset($_SESSION['score_request_tokens'][$t]);
+          }
+        }
+        if (isset($_SESSION['score_request_tokens'][$req_token])) {
+          Flash::add("ระบบกำลังประมวลผล หรือมีการกดส่งซ้ำ", "error");
+          Response::redirect('/?route=search&studentID=' . urlencode($student_id));
+        }
+        $_SESSION['score_request_tokens'][$req_token] = [
+          'ts' => $now,
+          'studentID' => strval($student_id),
+          'mode' => $mode,
+        ];
       }
 
 $current_score = intval($student['score'] ?? 0);        $new_score = $current_score + $delta; // negatives allowed
