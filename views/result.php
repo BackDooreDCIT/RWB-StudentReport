@@ -1,7 +1,7 @@
 <?php /* views/result.php — full functional version with styling */ ?>
 
 <link rel="stylesheet" href="/static/style2.css?v=recov1">
-<link rel="stylesheet" href="/static/log.css?v=recov15">
+<link rel="stylesheet" href="/static/log.css?v=recov16">
 <link rel="stylesheet" href="/static/mobile.css?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
 
@@ -56,10 +56,23 @@
       <section class="card action-card">
         <h2 class="subtitle">ปรับคะแนน</h2>
 
+        <?php
+          // Anti double-submit token (per page render)
+          // Stored in session as "in-flight" for a short time to block rapid double-click submits.
+          if (session_status() === PHP_SESSION_NONE) { @session_start(); }
+          try {
+            $form_token = bin2hex(random_bytes(16));
+          } catch (Exception $e) {
+            $form_token = bin2hex(random_bytes(8));
+          }
+          $_SESSION['score_submit_token'] = $form_token;
+        ?>
+
         <form class="form" method="POST" action="/?route=search" id="scoreForm">
           <input type="hidden" name="route" value="search">
           <input type="hidden" name="studentID" value="<?= htmlspecialchars($student_id ?? '') ?>">
           <input type="hidden" name="mode" id="scoreMode" value="deduct">
+          <input type="hidden" name="request_token" value="<?= htmlspecialchars($form_token) ?>">
 
           <div class="segmented" role="tablist" aria-label="โหมดการปรับคะแนน">
             <button class="seg-btn is-active" type="button" data-mode="deduct">หักคะแนน</button>
@@ -553,27 +566,47 @@
             });
           }
 
-          // Safety: block submit in deduct mode if no reason chosen
-          document.getElementById("scoreForm").addEventListener("submit", (e) => {
+          // Submit guard + cooldown (prevents double clicking / double submit)
+          let isSubmitting = false;
+          const scoreForm = document.getElementById("scoreForm");
+          scoreForm.addEventListener("submit", (e) => {
+            // Safety: block submit in deduct mode if no reason chosen
             if (modeInput.value === "deduct" && selected.length === 0) {
               e.preventDefault();
               openModal();
               return;
             }
 
-            // Disable all interactive controls in the form to prevent double submissions.
-            try {
-              const form = document.getElementById("scoreForm");
-              const els = form.querySelectorAll("button[type='submit'], input[type='submit'], button[type='button'], input[type='button']");
-              els.forEach(el => {
-                // leave non-form controls alone (defensive)
-                try{ el.disabled = true; }catch(e){}
-                if (el.classList) el.classList.add('is-disabled');
-              });
-              submitBtn.textContent = modeInput.value === "deduct" ? "กำลังบันทึก..." : "กำลังบันทึก...";
-            } catch (err) {
-              // ignore - don't block submit on JS error
+            // If already submitting, block subsequent submits
+            if (isSubmitting) {
+              e.preventDefault();
+              return;
             }
+            isSubmitting = true;
+
+            // Disable submit + key controls until request completes (page reload)
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('is-loading');
+            submitBtn.textContent = 'กำลังบันทึก...';
+
+            // Disable mode buttons + open reason button to avoid confusion
+            segBtns.forEach(b => b.disabled = true);
+            if (openBtn) openBtn.disabled = true;
+            // If modal is open, close it so user sees the main page while submitting
+            try { if (modal && modal.classList.contains('is-open')) closeModal(); } catch(err) {}
+
+            // If for some reason navigation is blocked, re-enable after 12s (failsafe)
+            window.setTimeout(() => {
+              if (!document.hidden) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('is-loading');
+                submitBtn.textContent = originalText;
+                segBtns.forEach(b => b.disabled = false);
+                if (openBtn) openBtn.disabled = false;
+                isSubmitting = false;
+              }
+            }, 12000);
           });
 
           // Init
